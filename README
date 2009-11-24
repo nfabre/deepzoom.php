@@ -8,13 +8,14 @@
   Installation
   ------------
  
-  *
+  * Just download
  
   
   Dependencies
   ------------
   
-  * GD
+  * Image Library http://phpthumb.gxdlabs.com/
+  * GD2
  
  
 --------------------------------------------------------------------------------
@@ -37,3 +38,18 @@
  
   Changelog
   ---------
+  0.1.0 (2009-11-24)
+  ------------------
+  First release. DeepZoom for PHP :)
+
+ --------------------------------------------------------------------------------
+  
+  TODO
+  --------- 
+  * Add "CollectionCreator"
+  * Add Dependency Injection
+  * Improve performance 
+  * Add PhpUnit tests suite
+  * Migrate to PHP 5.3.x
+
+     
