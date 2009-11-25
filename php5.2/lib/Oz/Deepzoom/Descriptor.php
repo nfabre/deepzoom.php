@@ -125,8 +125,8 @@ class Oz_Deepzoom_Descriptor {
 	 */
 	public function open($source) {
 		$xml = simplexml_load_file($source);
-		$this->_width = $xml->Size["Width"];
-        $this->_height = $xml->Size["Height"];
+		$this->_width = (int)$xml->Size["Width"];
+        $this->_height = (int)$xml->Size["Height"];
         $this->_tileSize = (string)$xml["TileSize"];
         $this->_tileOverlap = (string)$xml["Overlap"];
         $this->_tileFormat = (string)$xml["Format"];
@@ -170,7 +170,7 @@ class Oz_Deepzoom_Descriptor {
 	   if(0 <= $level and $level < $this->numLevels()) {
 	       $maxLevel = $this->numLevels() - 1 ;
 	       return pow(0.5,$maxLevel - $level);	
-	   } else throw new Oz_Deepzoom_Exception("Invalid pyramid level");
+	   } else throw new Oz_Deepzoom_Exception("Invalid pyramid level (scale)");
 	}	
 	
 	/**
@@ -185,7 +185,7 @@ class Oz_Deepzoom_Descriptor {
 		  $width = (int)ceil($this->_width * $scale);		
 		  $height = (int)ceil($this->_height * $scale);		
 		  return array($width,$height);
-		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level");
+		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level (dimension)");
 	}       
 	
 	/**
@@ -200,7 +200,7 @@ class Oz_Deepzoom_Descriptor {
 		  	$columns = (int)ceil(floatval($width) / $this->_tileSize);
 		  	$rows = (int)ceil(floatval($height) / $this->_tileSize);
 		  	return array($columns, $rows);
-		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level");
+		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level (NumTiles)");
 	}
 
 	/**
@@ -224,6 +224,6 @@ class Oz_Deepzoom_Descriptor {
 		    $width = min($width, $levelWidth - $x);
 		    $height = min($height, $levelHeight - $y);
 		    return array($x, $y, $width, $height);
-		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level");
+		} else throw new Oz_Deepzoom_Exception("Invalid pyramid level (TileBounds)");
 	}
 }
