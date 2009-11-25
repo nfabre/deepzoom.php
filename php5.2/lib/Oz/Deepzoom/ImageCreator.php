@@ -78,7 +78,7 @@ class Oz_Deepzoom_ImageCreator {
      * @param float $imageQuality
      * @param int $resizeFilter
      */
-	public function __construct($tileSize=256, $tileOverlap=1, $tileFormat="jpg", $imageQuality=0.95, $resizeFilter = null) {
+	public function __construct($tileSize=254, $tileOverlap=1, $tileFormat="jpg", $imageQuality=0.95, $resizeFilter = null) {
         $this->_tileSize = (int) $tileSize;
         $this->_tileFormat = $tileFormat;
         $this->_tileOverlap  = $this->_clamp((int)$tileOverlap,0,1);

@@ -99,7 +99,7 @@ class Oz_Deepzoom_Descriptor {
 	 * @param string $tileFormat
 	 * @return void
 	 */
-	public function __construct($width=null,$height=null,$tileSize=256,$tileOverlap=1,$tileFormat="jpg") {
+	public function __construct($width=null,$height=null,$tileSize=254,$tileOverlap=1,$tileFormat="jpg") {
         $this->_width = $width;
         $this->_height = $height;
         $this->_tileSize = $tileSize;
