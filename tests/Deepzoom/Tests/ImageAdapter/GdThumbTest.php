@@ -1,8 +1,6 @@
 <?php
 namespace Deepzoom\Tests\ImageAdapter;
 
-use Deepzoom\ImageAdapter;
-
 use Deepzoom\ImageAdapter\GdThumb;
 use Deepzoom\Exception as dzException;
 
