@@ -1,13 +1,11 @@
-<?php
+<?php 
+require_once __DIR__.'/../src/vendor/Symfony/Foundation/UniversalClassLoader.php';
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-if (file_exists($file = __DIR__.'/../autoload.php')) {
-    require_once $file;
-} 
+$loader = new Symfony\Foundation\UniversalClassLoader();
+$loader->registerNamespace('Symfony', __DIR__.'/../src/vendor');
+$loader->registerNamespace('Zend', __DIR__.'/../src/vendor/zf/library');
+$loader->registerNamespace('Imagine', __DIR__.'/../src/vendor/imagine/lib');
+$loader->registerNamespace('Deepzoom\\Tests', __DIR__);
+$loader->registerNamespace('Deepzoom', __DIR__.'/../src');
+
+$loader->register();
