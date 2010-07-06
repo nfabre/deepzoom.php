@@ -1,0 +1,6 @@
+.project
+index.php
+.buildpath
+tests/PHPUnit/*
+.settings/*
+.externaleToolBuilders/*
