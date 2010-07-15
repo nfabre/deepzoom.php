@@ -32,6 +32,13 @@ require_once __DIR__.'/src/vendor/Symfony/Foundation/UniversalClassLoader.php';
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/**
+ * Deepzoom universal loader
+ *
+ * @package    Deepzoom
+ * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
+ */ 
 $loader = new Symfony\Foundation\UniversalClassLoader();
 $loader->registerNamespace('Symfony', __DIR__.'/src/vendor');
 $loader->registerNamespace('Zend', __DIR__.'/src/vendor/zf/library');
