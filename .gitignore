@@ -3,4 +3,4 @@ index.php
 .buildpath
 tests/PHPUnit/*
 .settings/*
-.externaleToolBuilders/*
+.externalToolBuilders/*
