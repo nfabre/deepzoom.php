@@ -21,4 +21,4 @@ Installation
 
         $deep = new ImageCreator(new Descriptor(),new ImageAdapter\GdThumb());
         
-        deep->create(realpath('my/image.jpg'), 'my/deepzoom.dzi');
+        $deep->create(realpath('my/image.jpg'), 'my/deepzoom.dzi');
