@@ -2,7 +2,6 @@
 namespace Deepzoom;
 
 use Deepzoom\ImageAdapter;
-use Symfony\Components\DependencyInjection\Builder;
 use Deepzoom\ImageAdapter\ImageAdapterInterface;
 
 /**
@@ -44,28 +43,14 @@ use Deepzoom\ImageAdapter\ImageAdapterInterface;
  * @package    Deepzoom
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
-class ImageCreator {
-	/**
-     * Tile size
-     * 
-     * @var string
-     */ 
-    protected $_tileSize; 
-     
+class ImageCreator extends AbstractCreator {
     /**
      * Tile Overlap 
      * 
      * @var float
      */ 
     protected $_tileOverlap; 
-     
-    /**
-     * Tile format
-     * 
-     * @var string
-     */ 
-    protected $_tileFormat; 
-   
+
     /**
      * 
      * @var Deepzoom\DescriptorInterface
@@ -153,7 +138,6 @@ class ImageCreator {
         				  ->setTileOverlap($this->_tileOverlap)
         				  ->setTileFormat($this->_tileFormat);
         $aImage = pathinfo($destination);
-        
         /**
 		* @todo secure variables
 		*/
@@ -164,52 +148,28 @@ class ImageCreator {
         foreach (range(0,$this->_descriptor->getNumLevels() - 1) as $level) {
 	         $levelDir = $this->_ensure($imageFile.DIRECTORY_SEPARATOR.$level);
 	         $levelImage = $this->getImage($level);
-	         $tiles = $this->getTiles($level);
 	         $format = $this->_descriptor->getTileFormat();
-	         foreach ($tiles as $_tile) {
-	                list($column, $row) = $_tile;
-	                $bounds = $this->_descriptor->getTileBounds($level,$column,$row);
-	                $cropLevelImage = clone $levelImage;
-	                $cropLevelImage->crop($bounds['x'],$bounds['y'],$bounds['width'],$bounds['height']);
-	                $format = $this->_descriptor->getTileFormat();
-	                $tilePath = $levelDir.DIRECTORY_SEPARATOR.sprintf('%s_%s.%s',$column,$row,$format);
-	                $cropLevelImage->save($tilePath);
-	                unset($cropLevelImage);
-	         }
+            
+	         $tiles = $this->_descriptor->getNumTiles($level);
+             foreach (range(0, $tiles['columns'] - 1) as $column) {
+                foreach (range(0, $tiles['rows'] - 1) as $row) {
+                    $bounds = $this->_descriptor->getTileBounds($level,$column,$row);
+                    $cropLevelImage = clone $levelImage;
+                    $cropLevelImage->crop($bounds['x'],$bounds['y'],$bounds['width'],$bounds['height']);
+                    $tilePath = $levelDir.DIRECTORY_SEPARATOR.sprintf('%s_%s.%s',$column,$row,$format);
+                    $cropLevelImage->save($tilePath);
+                    unset($cropLevelImage);
+                }
+             }
 	         unset($levelImage);
         }
         $this->_descriptor->save($destination);
     } 
- 
-	/**
-     * Ensures that $val is between the limits set by $min and $max.
-     *
-     * @param int $val
-     * @param int $min
-     * @param int $max
-     * 
-     * @return int
-     */ 
-    protected function _clamp($val, $min, $max) {
-	    if($val < $min) {
-			return $min;
-		}elseif($val > $max) {
-			return $max;
-		}
-		return $val;
-    } 
-     
+    
     /**
-     * Create directory if not exist
-     *
-     * @param string $pathname
      * 
-     * @return string
-     */ 
-    protected function _ensure($pathname) {
-    	if(!file_exists($pathname)) {
-			mkdir($pathname, 0775, true);
-		}
-		return $pathname;
-    } 
+     */
+    public function getDescriptor() {
+    	return $this->_descriptor;
+    }
 }

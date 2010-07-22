@@ -84,12 +84,13 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	}
 	
 	/**
-	 * Saves an image
-	 * 
-	 * @param string $destination
-	 */
-	public function save($destination) {
-		parent::save($destination,'jpg');
+     * Saves an image
+     * 
+     * @param string $destination
+     * @param string $format
+     */
+    public function save($destination, $format=null) {
+		parent::save($destination, $format);
 		return $this;	
 	}
 	
@@ -125,6 +126,10 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	    if($this->newDimensions['newHeight'] == 0) {
           $this->newDimensions['newHeight'] = 1; 
         }
+	}
+	
+	public function newImage($width,$height) {
+	   $this->oldImage = imagecreate($width, $height);
 	}
 
 }

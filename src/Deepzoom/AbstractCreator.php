@@ -1,5 +1,5 @@
 <?php
-namespace Deepzoom\ImageAdapter; 
+namespace Deepzoom;
 
 /**
 * Deep Zoom Tools
@@ -35,51 +35,55 @@ namespace Deepzoom\ImageAdapter;
 */
 
 /**
- * ImageAdapter Interface 
+ * Image Creator, generate pyramid
  *
  * @package    Deepzoom
- * @subpackage ImageAdapter
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
-interface ImageAdapterInterface {
+abstract class AbstractCreator {
+    /**
+     * Tile size
+     * 
+     * @var string
+     */ 
+    protected $_tileSize; 
 
-	/**
-	 * Resizes an image to be no larger than $width or $heigh
-	 * 
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function resize($width,$height);
-	
-	/**
-	 * Returns image dimensions
-	 * 
-	 * return array
-	 */
-	public function getDimensions();
-	
-	/**
-	 * Cropping function that crops an image using $startX and $startY as the upper-left hand corner
-	 *  
-	 * @param int $startX
-	 * @param int $startY
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function crop($startX,$startY,$width,$height);
-	
-	/**
-	 * Saves an image
-	 * 
-	 * @param string $destination
-	 * @param string $format
-	 */
-	public function save($destination, $format=null);
-	
-	/**
-	 * Image path
-	 * 
-	 * @param strung $destination
-	 */
-	public function setSource($path);
+    /**
+     * Tile format
+     * 
+     * @var string
+     */ 
+    protected $_tileFormat; 
+        
+    /**
+     * Ensures that $val is between the limits set by $min and $max.
+     *
+     * @param int $val
+     * @param int $min
+     * @param int $max
+     * 
+     * @return int
+     */ 
+    protected function _clamp($val, $min, $max) {
+        if($val < $min) {
+            return $min;
+        }elseif($val > $max) {
+            return $max;
+        }
+        return $val;
+    } 
+     
+    /**
+     * Create directory if not exist
+     *
+     * @param string $pathname
+     * 
+     * @return string
+     */ 
+    protected function _ensure($pathname) {
+        if(!file_exists($pathname)) {
+            mkdir($pathname, 0775, true);
+        }
+        return $pathname;
+    } 
 }

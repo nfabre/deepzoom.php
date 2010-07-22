@@ -77,11 +77,12 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
 	}
 	
 	/**
-	 * Saves an image
-	 * 
-	 * @param string $destination
-	 */
-	public function save($destination){
+     * Saves an image
+     * 
+     * @param string $destination
+     * @param string $format
+     */
+    public function save($destination, $format=null) {
 		$this->writeimage($destination);
 		return $this;
 	}

@@ -47,6 +47,10 @@ class Stub implements ImageAdapterInterface {
 	protected $_width;
 	protected $_height;
 	
+	public function __construct($width=null,$height=null) {
+	   $this->_width = $width;
+       $this->_height = $height;	
+	}
 	/**
 	 * Resizes an image to be no larger than $width or $heigh
 	 * 
@@ -60,9 +64,11 @@ class Stub implements ImageAdapterInterface {
 	}
 	
 	public function setSource($img) {
-		list($width,$height) = getimagesize($img);
-		$this->_width = $width;
-		$this->_height = $height;
+		if(empty($this->_width)) {
+		  list($width,$height) = getimagesize($img);
+		  $this->_width = $width;
+		  $this->_height = $height;
+		}
 		return $this;
 	}
 	
@@ -99,7 +105,11 @@ class Stub implements ImageAdapterInterface {
 	 * 
 	 * @param string $destination
 	 */
-	public function save($destination){
+	public function save($destination, $format=null){
 		return true;
+	}
+	
+	public function newImage($width,$height) {
+	   return true;	
 	}
 }

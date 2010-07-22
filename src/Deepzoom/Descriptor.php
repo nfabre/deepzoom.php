@@ -124,6 +124,7 @@ class Descriptor implements DescriptorInterface {
 	        $this->_tileOverlap = (int)$xml["Overlap"];
 	        $this->_tileFormat = (string)$xml["Format"];
 		} else throw new Exception('File not found : '.$source);
+		
 	    return $this;
 	}
 	
@@ -136,6 +137,7 @@ class Descriptor implements DescriptorInterface {
      */ 
 	public function save($destination) {
 		file_put_contents($destination,$this->dump());
+		
 		return $this;	
 	}
 	
@@ -160,6 +162,7 @@ class Descriptor implements DescriptorInterface {
             $maxDimension = max(array($this->_width,$this->_height));
             $this->_numLevels = (int)ceil(log($maxDimension,2)) + 1;
         }
+        
         return $this->_numLevels;
 	}
 	
@@ -173,6 +176,7 @@ class Descriptor implements DescriptorInterface {
 	public function getScale($level) {
 		if(0 <= $level && $level < $this->getNumLevels()) {
 			$maxLevel = $this->getNumLevels() - 1 ;
+			
 			return pow(0.5,$maxLevel - $level);
 		} else throw new Exception("Invalid pyramid level (scale)");
 	} 
@@ -193,7 +197,8 @@ class Descriptor implements DescriptorInterface {
 				$height = (int)ceil($this->_height * $scale);
 				$this->_dimensions[$key] = array('width' => $width,'height' => $height);
 			} else throw new Exception("Invalid pyramid level (dimension)");
-		} 
+		}
+		 
 		return $this->_dimensions[$key];
 	} 
 	
@@ -209,6 +214,7 @@ class Descriptor implements DescriptorInterface {
 			$dimension = $this->getDimension($level);
 			$columns = (int)ceil(floatval($dimension['width']) / $this->_tileSize);
 			$rows = (int)ceil(floatval($dimension['height']) / $this->_tileSize);
+			
 			return array('columns' => $columns, 'rows' => $rows);
 		} else throw new Exception("Invalid pyramid level (NumTiles)");
 	}
@@ -250,6 +256,7 @@ class Descriptor implements DescriptorInterface {
         $offsetY = $row == 0 ? 0 : $this->_tileOverlap;
         $x = ($column * $this->_tileSize) - $offsetX;
         $y = ($row * $this->_tileSize) - $offsetY;
+        
         return array('x' => $x, 'y' => $y);
     }
     
@@ -271,6 +278,7 @@ class Descriptor implements DescriptorInterface {
     public function setWidth($width)
     {
         $this->_width = $width;
+        
         return $this;
     }
     
@@ -292,6 +300,7 @@ class Descriptor implements DescriptorInterface {
     public function setHeight($height)
     {
         $this->_height = $height;
+        
         return $this;
     }
     
@@ -313,6 +322,7 @@ class Descriptor implements DescriptorInterface {
     public function setTileSize($tileSize)
     {
         $this->_tileSize = $tileSize;
+        
         return $this;
     }
     
@@ -334,6 +344,7 @@ class Descriptor implements DescriptorInterface {
     public function setTileOverlap($tileOverlap)
     {
         $this->_tileOverlap = $tileOverlap;
+        
         return $this;
     }
     
@@ -355,6 +366,7 @@ class Descriptor implements DescriptorInterface {
     public function setTileFormat($tileFormat)
     {
         $this->_tileFormat = $tileFormat;
+        
         return $this;
     }    
     

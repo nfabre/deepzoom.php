@@ -125,6 +125,11 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
     	$this->assertFileExists($this->path.'hlegius.xml','-->create() Creates Deep Zoom image from source file and saves it to destination');
     }
     
+    public function testCreateMillion() {
+        $imageCreator = new ImageCreator(new Descriptor(),new Stub(50000,50000),254,1,'jpg');	
+        $imageCreator->create($this->path.'hlegius.jpg',$this->path.'hlegius.xml');  
+    }
+    
     public function testClamp()
     {
     	$imageCreator = new ImageCreator(new Descriptor(),new GdThumb(),10,0.5,'png');
