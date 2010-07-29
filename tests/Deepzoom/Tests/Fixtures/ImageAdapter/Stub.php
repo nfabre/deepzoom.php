@@ -2,7 +2,7 @@
 namespace Deepzoom\Tests\Fixtures\ImageAdapter; 
 
 use Deepzoom\ImageAdapter\ImageAdapterInterface;
-
+use Deepzoom\StreamWrapper\StreamWrapperInterface;
 /**
 * Deep Zoom Tools
 *
@@ -46,6 +46,7 @@ use Deepzoom\ImageAdapter\ImageAdapterInterface;
 class Stub implements ImageAdapterInterface {
 	protected $_width;
 	protected $_height;
+	protected $_streamWrapper;
 	
 	public function __construct($width=null,$height=null) {
 	   $this->_width = $width;
@@ -112,4 +113,25 @@ class Stub implements ImageAdapterInterface {
 	public function newImage($width,$height) {
 	   return true;	
 	}
+	
+/**
+     * Sets the stream wrapper
+     *
+     * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
+     */
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
+        $this->_streamWrapper = $streamWrapper;
+        
+        return $this;   
+    }
+    
+    /**
+     * Gets the stream wrapper
+     *
+     * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
+     */
+    public function getStreamWrapper()
+    {
+        return $this->_streamWrapper;
+    }
 }

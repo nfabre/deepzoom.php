@@ -8,6 +8,7 @@ use Symfony\Components\Console\Input\InputArgument,
     Deepzoom\ImageCreator,
     Deepzoom\Exception as dzException,
     Deepzoom\ImageAdapter\GdThumb,
+    Deepzoom\StreamWrapper\File,
     Deepzoom\Descriptor;
 /**
 * Deep Zoom Tools
@@ -115,7 +116,7 @@ EOT
             );
         }
 		try {		
-        	$deep = new ImageCreator(new Descriptor(),new GdThumb(),$tileSize,$tileOverlap,$tileFormat);
+        	$deep = new ImageCreator(new File(),new Descriptor(new File()),new GdThumb(),$tileSize,$tileOverlap,$tileFormat);
         	$deep->create(realpath($source),$destination);
         	$output->doWrite('Image converted into the Deep Zoom Image (DZI) file format',true);
 		} catch(dzException $e) {

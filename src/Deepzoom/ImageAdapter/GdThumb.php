@@ -4,6 +4,7 @@ namespace Deepzoom\ImageAdapter;
 require_once __DIR__.'/../../vendor/phpthumb/ThumbBase.inc.php';
 require_once __DIR__.'/../../vendor/phpthumb/GdThumb.inc.php';
 
+use Deepzoom\StreamWrapper\StreamWrapperInterface;
 /**
 * Deep Zoom Tools
 *
@@ -50,6 +51,8 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	 * @var $_source string
 	 */
 	protected $_source;
+	
+	protected $_streamWrapper;
 	
 	public function __construct () {
 	}
@@ -131,5 +134,25 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	public function newImage($width,$height) {
 	   $this->oldImage = imagecreate($width, $height);
 	}
-
+    
+    /**
+     * Sets the stream wrapper
+     *
+     * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
+     */
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
+        $this->_streamWrapper = $streamWrapper;
+        
+        return $this;   
+    }
+    
+    /**
+     * Gets the stream wrapper
+     *
+     * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
+     */
+    public function getStreamWrapper()
+    {
+        return $this->_streamWrapper;
+    }
 }

@@ -1,5 +1,6 @@
 <?php
-namespace Deepzoom\ImageAdapter; 
+namespace Deepzoom\Tests\Fixtures\StreamWrapper; 
+
 
 use Deepzoom\StreamWrapper\StreamWrapperInterface;
 /**
@@ -35,66 +36,63 @@ use Deepzoom\StreamWrapper\StreamWrapperInterface;
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
- * Imagick Adapter 
- *
- * @package    Deepzoom
- * @subpackage ImageAdapter
- * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
- */
-class Imagick extends \Imagick implements ImageAdapterInterface {
 
-	/**
-	 * Resizes an image to be no larger than $width or $heigh
-	 * 
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function resize($width,$height) {
-		$this->scaleImage($width,$height);
-		return $this;
-	}
-	
-	/**
-	 * Returns image dimensions
-	 * 
-	 * return array
-	 */
-	public function getDimensions() {
-		return array('width' => $this->getImageWidth(),'height' =>$this->getImageHeight());	
-	}
-	
-	/**
-	 * Cropping function that crops an image using $startX and $startY as the upper-left hand corner
-	 *  
-	 * @param int $startX
-	 * @param int $startY
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function crop($startX,$startY,$width,$height){
-		$this->cropimage($width,$height,$startX,$startY);
-		return $this;	
-	}
-	
-	/**
-     * Saves an image
+class Stub implements StreamWrapperInterface {
+
+    /**
+     * Checks whether a file exists
      * 
-     * @param string $destination
-     * @param string $format
+     * @param string $filename
+     * @retur bool Returns true if the file specified by filename exists; false otherwise. 
      */
-    public function save($destination, $format=null) {
-		$this->writeimage($destination);
-		return $this;
-	}
-	
-	/**
-	 * Image path
-	 * 
-	 * @param strung $destination
-	 */
-	public function setSource($path){
-		$this->readImage($path);
-		return $this;
-	}
+    public function exists($filename) {
+        return file_exists($filename);
+    }
+    
+    /**
+     * Reads entire file into a string
+     * 
+     * @param string $filename
+     * @returnstring returns the file in a string
+     */
+    public function getContents($filename){
+        return file_get_contents($filename);
+    }
+    
+    /**
+     * Write a string to a file
+     * 
+     * @param string $filename
+     * @param mixed $data
+     * @return bool Returns true on success or false on failure. 
+     */
+    public function putContents($filename, $data) {
+        $result = file_put_contents($filename, $data);
+        
+        return $result > 0 ? true : false;
+    }
+    
+    /**
+     * Returns information about a file path
+     * 
+     * @param string $path The path being checked. 
+     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
+     */
+    public function getPathInfo($path) {
+        return pathinfo($path);
+    }
+    
+    /**
+     * Create directory if not exist
+     * 
+     * @param string $path The path being checked. 
+     * @return string The path
+     */
+    public function ensure($path) {
+         if(!file_exists($path)) {
+            mkdir($path, 0775, true);
+        }
+        
+        return $path;
+    }
 }

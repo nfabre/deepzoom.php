@@ -1,8 +1,8 @@
 <?php
 namespace Deepzoom;
 
-use Deepzoom\ImageAdapter;
 use Deepzoom\ImageAdapter\ImageAdapterInterface;
+use Deepzoom\StreamWrapper\StreamWrapperInterface;
 
 /**
 * Deep Zoom Tools
@@ -50,7 +50,13 @@ class ImageCreator extends AbstractCreator {
      * @var float
      */ 
     protected $_tileOverlap; 
-
+    
+    /**
+     *
+     * @var Deepzoom\StreamWrapper\StreamWrapperInterface
+     */
+    protected $_streamWrapper;
+    
     /**
      * 
      * @var Deepzoom\DescriptorInterface
@@ -62,18 +68,20 @@ class ImageCreator extends AbstractCreator {
      * @var Deepzoom\ImageAdapter\ImageAdapterInterface
      */
     protected $_imageAdapter;
-    
+
     /**
      * Constructor
      * 
      * @param Deepzoom\DescriptorInterface $descriptor
      * @param Deepzoom\ImageAdapter\ImageAdapterInterface $adapter
+     * @param Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
      * @param int $tileSize
      * @param int $tileOverlap
      * @param string $tileFormat
      */
-	public function __construct(DescriptorInterface $descriptor, ImageAdapterInterface  $adapter,$tileSize=254, $tileOverlap=1, $tileFormat='jpg')
+	public function __construct(StreamWrapperInterface $streamWrapper,DescriptorInterface $descriptor, ImageAdapterInterface  $adapter, $tileSize=254, $tileOverlap=1, $tileFormat='jpg')
     {
+        $this->_streamWrapper = $streamWrapper;
         $this->_descriptor = $descriptor;
         $this->_imageAdapter = $adapter;
         $this->_tileSize = (int) $tileSize;
@@ -130,23 +138,28 @@ class ImageCreator extends AbstractCreator {
      * @throw Deepzoom\Exception check source existe and destination is writable
      */ 
     public function  create($source,$destination) {
-    	$this->_imageAdapter->setSource($source);
+    	$this->_imageAdapter->setStreamWrapper($this->_streamWrapper)->setSource($source);
         $dimensions = $this->_imageAdapter->getDimensions();
-        $this->_descriptor->setWidth($dimensions['width'])
+        $this->_descriptor->setStreamWrapper($this->_streamWrapper)
+                          ->setWidth($dimensions['width'])
         				  ->setHeight($dimensions['height'])
         				  ->setTileSize($this->_tileSize)
         				  ->setTileOverlap($this->_tileOverlap)
         				  ->setTileFormat($this->_tileFormat);
-        $aImage = pathinfo($destination);
+        //$aImage = pathinfo($destination);
+        $aImage = $this->_streamWrapper->getPathInfo($destination);
         /**
 		* @todo secure variables
 		*/
         $imageName = $aImage['filename'];
         $dirName = $aImage['dirname'];
-        $imageFile = $this->_ensure($dirName.DIRECTORY_SEPARATOR.$imageName.'_files');
+        //$imageFile = $this->_ensure($dirName.DIRECTORY_SEPARATOR.$imageName.'_files');
+        $imageFile = $this->_streamWrapper->ensure($dirName.DIRECTORY_SEPARATOR.$imageName.'_files');
        
         foreach (range(0,$this->_descriptor->getNumLevels() - 1) as $level) {
-	         $levelDir = $this->_ensure($imageFile.DIRECTORY_SEPARATOR.$level);
+	         //$levelDir = $this->_ensure($imageFile.DIRECTORY_SEPARATOR.$level);
+	         $levelDir = $this->_streamWrapper->ensure($imageFile.DIRECTORY_SEPARATOR.$level);
+	         
 	         $levelImage = $this->getImage($level);
 	         $format = $this->_descriptor->getTileFormat();
             

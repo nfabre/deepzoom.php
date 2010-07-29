@@ -1,8 +1,12 @@
 <?php
 namespace Deepzoom\Tests;
 
+use Deepzoom;
+
 use Deepzoom\ImageAdapter\GdThumb;
+use Deepzoom\StreamWrapper\File;
 use Deepzoom\Tests\Fixtures\ImageAdapter\Stub;
+use Deepzoom\Tests\Fixtures\StreamWrapper\Stub as streamStub;
 use Deepzoom\ImageCreator;
 use Deepzoom\Descriptor;
 use Deepzoom\Exception as dzException;
@@ -70,7 +74,7 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
     
 	public function testConstructor()
     {
-        $imageCreator = new ImageCreator(new Descriptor(),new GdThumb(),10,0.5,'png');
+        $imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new GdThumb(),10,0.5,'png');
         $this->assertAttributeType('Deepzoom\DescriptorInterface','_descriptor',$imageCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeType('Deepzoom\ImageAdapter\ImageAdapterInterface','_imageAdapter',$imageCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeEquals(10,'_tileSize',$imageCreator, '__construct() takes the tile size as its first argument'); 
@@ -81,14 +85,14 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
  	public function testGetTiles()
     {
     	$stub = $this->_createMockDescriptor();
-    	$imageCreator = new ImageCreator($stub,new GdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),$stub,new GdThumb(),10,0.5,'png');
     	$tiles = $imageCreator->getTiles(10);
      	$this->assertType('array',$tiles, '->getTiles() Iterator for all tiles in the given level');
         $this->assertEquals(100,sizeof($tiles), '->getTiles() Iterator for all tiles in the given level');
     }
     
     public function testGetImageException() {
-    	$imageCreator = new ImageCreator($this->_createMockDescriptor(),new GdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),$this->_createMockDescriptor(),new GdThumb(),10,0.5,'png');
     	try {
     		$imageCreator->getImage(-1);
     		$this->fail('Excepion fail');
@@ -108,31 +112,36 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
     	$stub->expects($this->any())
                  ->method('getDimension')
                  ->will($this->returnValue(array('width' => 800,'height' => 800)));	
-    	$imageCreator = new ImageCreator($stub,$this->_createMockGdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),$stub,$this->_createMockGdThumb(),10,0.5,'png');
     	$this->assertTrue($imageCreator->getImage(8) instanceof GdThumb);
     	$stub = $this->_createMockDescriptor();
     	$stub->expects($this->any())
                  ->method('getDimension')
                  ->will($this->returnValue(array('width' => 500,'height' => 500)));	
-    	$imageCreator = new ImageCreator($stub,$this->_createMockGdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),$stub,$this->_createMockGdThumb(),10,0.5,'png');
     	$this->assertTrue($imageCreator->getImage(8) instanceof GdThumb);
     }
     
+    public function testGetDescriptor() {
+        $imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new GdThumb());
+        $this->assertType('Deepzoom\DescriptorInterface',$imageCreator->getDescriptor(), '__construct() takes the tile size as its first argument'); 
+        
+    }
     
     public function testCreate() {
-    	$imageCreator = new ImageCreator(new Descriptor(),new Stub(),254,1,'jpg');
+    	$imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new Stub(),254,1,'jpg');
     	$imageCreator->create($this->path.'hlegius.jpg',$this->path.'hlegius.xml');  
     	$this->assertFileExists($this->path.'hlegius.xml','-->create() Creates Deep Zoom image from source file and saves it to destination');
     }
     
     public function testCreateMillion() {
-        $imageCreator = new ImageCreator(new Descriptor(),new Stub(50000,50000),254,1,'jpg');	
+        $imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new Stub(50000,50000),254,1,'jpg');	
         $imageCreator->create($this->path.'hlegius.jpg',$this->path.'hlegius.xml');  
     }
     
     public function testClamp()
     {
-    	$imageCreator = new ImageCreator(new Descriptor(),new GdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new GdThumb(),10,0.5,'png');
      	$method = new \ReflectionMethod(
           'Deepzoom\ImageCreator', '_clamp'
         );
@@ -152,7 +161,7 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
     
     public function testEnsure()
     {
-    	$imageCreator = new ImageCreator(new Descriptor(),new GdThumb(),10,0.5,'png');
+    	$imageCreator = new ImageCreator(new streamStub(),new Descriptor(new streamStub()),new GdThumb(),10,0.5,'png');
     	$this->assertFalse(file_exists(__DIR__ . '/path'));
     	$method = new \ReflectionMethod(
           'Deepzoom\ImageCreator', '_ensure'
@@ -163,7 +172,7 @@ class ImageCreatorTest extends \PHPUnit_Framework_TestCase
     }
     
     protected function _createMockDescriptor() {
-    	$stub = $this->getMock('Deepzoom\Descriptor');
+    	$stub = $this->getMock('Deepzoom\Descriptor',array(), array(),'',false,false,true );
         $stub->expects($this->any())
         	  ->method('getNumLevels')
               ->will($this->returnValue(10));

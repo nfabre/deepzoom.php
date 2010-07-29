@@ -1,7 +1,6 @@
 <?php
-namespace Deepzoom\ImageAdapter; 
+namespace Deepzoom\StreamWrapper;
 
-use Deepzoom\StreamWrapper\StreamWrapperInterface;
 /**
 * Deep Zoom Tools
 *
@@ -36,65 +35,36 @@ use Deepzoom\StreamWrapper\StreamWrapperInterface;
 */
 
 /**
- * Imagick Adapter 
+ * StreamWrapper Interface
  *
  * @package    Deepzoom
- * @subpackage ImageAdapter
+ * @subpackage StreamWrapper
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
-class Imagick extends \Imagick implements ImageAdapterInterface {
+interface StreamWrapperInterface {
 
 	/**
-	 * Resizes an image to be no larger than $width or $heigh
+	 * Checks whether a file exists
 	 * 
-	 * @param int $width
-	 * @param int $height
+	 * @param string $filename
+	 * @retur bool Returns true if the file specified by filename exists; false otherwise. 
 	 */
-	public function resize($width,$height) {
-		$this->scaleImage($width,$height);
-		return $this;
-	}
+	public function exists($filename);
 	
 	/**
-	 * Returns image dimensions
+	 * Reads entire file into a string
 	 * 
-	 * return array
+	 * @param string $filename
+	 * @returnstring returns the file in a string
 	 */
-	public function getDimensions() {
-		return array('width' => $this->getImageWidth(),'height' =>$this->getImageHeight());	
-	}
+	public function getContents($filename);
 	
 	/**
-	 * Cropping function that crops an image using $startX and $startY as the upper-left hand corner
-	 *  
-	 * @param int $startX
-	 * @param int $startY
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function crop($startX,$startY,$width,$height){
-		$this->cropimage($width,$height,$startX,$startY);
-		return $this;	
-	}
-	
-	/**
-     * Saves an image
-     * 
-     * @param string $destination
-     * @param string $format
-     */
-    public function save($destination, $format=null) {
-		$this->writeimage($destination);
-		return $this;
-	}
-	
-	/**
-	 * Image path
+	 * Write a string to a file
 	 * 
-	 * @param strung $destination
+	 * @param string $filename
+	 * @param mixed $data
+	 * @return bool Returns true on success or false on failure. 
 	 */
-	public function setSource($path){
-		$this->readImage($path);
-		return $this;
-	}
+	public function putContents($filename, $data);
 }

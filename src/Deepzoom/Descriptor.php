@@ -1,6 +1,8 @@
 <?php
 namespace Deepzoom;
 
+use Deepzoom\StreamWrapper\StreamWrapperInterface;
+
 /**
 * Deep Zoom Tools
 *
@@ -42,6 +44,12 @@ namespace Deepzoom;
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
 class Descriptor implements DescriptorInterface {
+	/**
+     *
+     * @var Deepzoom\StreamWrapper\StreamWrapperInterface
+     */
+    protected $_streamWrapper;
+    
 	/**
 	 * Width of the original image 
 	 *
@@ -89,9 +97,11 @@ class Descriptor implements DescriptorInterface {
 	 * @var array
 	 */
 	protected $_dimensions = array();	
+	
 	/**
 	 * Constructor
 	 *
+	 * @paral Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper 
 	 * @param int $width
 	 * @param int $height
 	 * @param int $tileSize
@@ -99,7 +109,8 @@ class Descriptor implements DescriptorInterface {
 	 * @param string $tileFormat
 	 * @return void
 	 */
-	public function __construct($width=null,$height=null,$tileSize=254,$tileOverlap=1,$tileFormat="jpg") {
+	public function __construct(StreamWrapperInterface $streamWrapper,$width=null,$height=null,$tileSize=254,$tileOverlap=1,$tileFormat="jpg") {
+		$this->_streamWrapper = $streamWrapper;
 		$this->_width = $width;
         $this->_height = $height;
         $this->_tileSize = $tileSize;
@@ -116,8 +127,8 @@ class Descriptor implements DescriptorInterface {
 	 * @throw Deepzoom\Exception check pyramid level
 	 */
 	public function open($source) {
-		if (file_exists($source)) {
-			$xml = simplexml_load_file($source);
+		if($this->_streamWrapper->exists($source)) {
+			$xml = simplexml_load_string($this->_streamWrapper->getContents($source));
 			$this->_width = (int)$xml->Size["Width"];
 	        $this->_height = (int)$xml->Size["Height"];
 	        $this->_tileSize = (int)$xml["TileSize"];
@@ -136,8 +147,7 @@ class Descriptor implements DescriptorInterface {
      * @return Deepzoom\Descriptor Fluent interface
      */ 
 	public function save($destination) {
-		file_put_contents($destination,$this->dump());
-		
+		$this->_streamWrapper->putContents($destination,$this->dump());
 		return $this;	
 	}
 	
@@ -368,7 +378,28 @@ class Descriptor implements DescriptorInterface {
         $this->_tileFormat = $tileFormat;
         
         return $this;
-    }    
+    } 
+      
+    /**
+     * Sets the stream wrapper
+     *
+     * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
+     */
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
+        $this->_streamWrapper = $streamWrapper;
+        
+    	return $this;	
+    }
+    
+    /**
+     * Gets the stream wrapper
+     *
+     * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
+     */
+    public function getStreamWrapper()
+    {
+        return $this->_streamWrapper;
+    }
     
     
     protected function startXml()

@@ -5,6 +5,7 @@ use Deepzoom;
 
 use Deepzoom\ImageAdapter\GdThumb;
 use Deepzoom\Tests\Fixtures\ImageAdapter\Stub;
+use Deepzoom\Tests\Fixtures\StreamWrapper\Stub as streamStub;
 use Deepzoom\CollectionCreator;
 use Deepzoom\Descriptor;
 use Deepzoom\Exception as dzException;
@@ -72,7 +73,7 @@ class CollectionCreatorTest extends \PHPUnit_Framework_TestCase
     
     public function testConstructor()
     {
-        $collectionCreator = new CollectionCreator(new Descriptor(),new GdThumb(),10,'png',3);
+        $collectionCreator = new CollectionCreator(new Descriptor(new streamStub()),new GdThumb(),10,'png',3);
         $this->assertAttributeType('Deepzoom\DescriptorInterface','_descriptor',$collectionCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeType('Deepzoom\ImageAdapter\ImageAdapterInterface','_imageAdapter',$collectionCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeEquals(10,'_tileSize',$collectionCreator, '__construct() takes the tile size as its first argument'); 
