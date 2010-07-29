@@ -52,6 +52,9 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	 */
 	protected $_source;
 	
+	/**
+	 * @var Deepzoom\StreamWrapper\StreamWrapperInterface $_streamWrapper
+	 */
 	protected $_streamWrapper;
 	
 	public function __construct () {

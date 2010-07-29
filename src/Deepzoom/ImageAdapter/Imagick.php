@@ -43,7 +43,12 @@ use Deepzoom\StreamWrapper\StreamWrapperInterface;
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
 class Imagick extends \Imagick implements ImageAdapterInterface {
-
+    
+    /**
+     * @var Deepzoom\StreamWrapper\StreamWrapperInterface $_streamWrapper
+     */
+    protected $_streamWrapper;
+    
 	/**
 	 * Resizes an image to be no larger than $width or $heigh
 	 * 
@@ -97,4 +102,25 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
 		$this->readImage($path);
 		return $this;
 	}
+	
+    /**
+     * Sets the stream wrapper
+     *
+     * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
+     */
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
+        $this->_streamWrapper = $streamWrapper;
+        
+        return $this;   
+    }
+    
+    /**
+     * Gets the stream wrapper
+     *
+     * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
+     */
+    public function getStreamWrapper()
+    {
+        return $this->_streamWrapper;
+    }
 }

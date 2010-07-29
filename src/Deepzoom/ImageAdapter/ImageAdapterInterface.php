@@ -1,6 +1,7 @@
 <?php
 namespace Deepzoom\ImageAdapter; 
 
+use Deepzoom\StreamWrapper\StreamWrapperInterface;
 /**
 * Deep Zoom Tools
 *
@@ -82,4 +83,18 @@ interface ImageAdapterInterface {
 	 * @param strung $destination
 	 */
 	public function setSource($path);
+	
+	/**
+     * Sets the stream wrapper
+     *
+     * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
+     */
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper);
+    
+    /**
+     * Gets the stream wrapper
+     *
+     * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
+     */
+    public function getStreamWrapper();
 }
