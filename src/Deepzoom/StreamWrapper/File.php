@@ -93,4 +93,8 @@ class File implements StreamWrapperInterface {
         
         return $path;
     }
+    
+    public function getPrefix() {
+    	return '';
+    }
 }

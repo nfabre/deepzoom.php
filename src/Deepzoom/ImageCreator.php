@@ -140,13 +140,11 @@ class ImageCreator extends AbstractCreator {
     public function  create($source,$destination) {
     	$this->_imageAdapter->setStreamWrapper($this->_streamWrapper)->setSource($source);
         $dimensions = $this->_imageAdapter->getDimensions();
-        $this->_descriptor->setStreamWrapper($this->_streamWrapper)
-                          ->setWidth($dimensions['width'])
+        $this->_descriptor->setWidth($dimensions['width'])
         				  ->setHeight($dimensions['height'])
         				  ->setTileSize($this->_tileSize)
         				  ->setTileOverlap($this->_tileOverlap)
         				  ->setTileFormat($this->_tileFormat);
-        //$aImage = pathinfo($destination);
         $aImage = $this->_streamWrapper->getPathInfo($destination);
         /**
 		* @todo secure variables

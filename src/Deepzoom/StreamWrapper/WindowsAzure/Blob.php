@@ -37,7 +37,33 @@ use  Deepzoom\StreamWrapper\StreamWrapperInterface;
 
 
 class Blob implements StreamWrapperInterface {
-
+	/**
+	 * 
+	 * @var $_container string
+	 */
+	protected $_container;
+	
+	/**
+	 * @var $_name string
+	 */
+	protected $_name;
+	
+	/**
+	 * @var $_storageClient Zend_Service_WindowsAzure_Storage_Blob
+	 */
+	protected $_storageClient;
+	
+	/**
+	 * 
+	 * @param string $container
+	 * @param string $name
+	 */
+    public function __construct($container,$name = 'azure') {
+    	$this->_container = $container;
+    	$this->_name = $name;
+    	$this->_storageClient = new \Zend_Service_WindowsAzure_Storage_Blob();
+    	$this->_storageClient->registerStreamWrapper();
+    }
     /**
      * Checks whether a file exists
      * 
@@ -45,7 +71,7 @@ class Blob implements StreamWrapperInterface {
      * @retur bool Returns true if the file specified by filename exists; false otherwise. 
      */
     public function exists($filename) {
-        return file_exists($filename);
+        return file_exists($this->formatUri($filename));
     }
     
     /**
@@ -55,7 +81,7 @@ class Blob implements StreamWrapperInterface {
      * @returnstring returns the file in a string
      */
     public function getContents($filename){
-        return file_get_contents($filename);
+        return file_get_contents($this->formatUri($filename));
     }
     
     /**
@@ -66,8 +92,36 @@ class Blob implements StreamWrapperInterface {
      * @return bool Returns true on success or false on failure. 
      */
     public function putContents($filename, $data) {
-        $result = file_put_contents($filename, $data);
+        $result = file_put_contents($this->formatUri($filename), $data);
         
         return $result > 0 ? true : false;
+    }
+    
+    /**
+     * Returns information about a file path
+     * 
+     * @param string $path The path being checked. 
+     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
+     */
+    public function getPathInfo($path) {
+    	return pathinfo($path);
+    }
+    
+    public function getPrefix() {
+    	return "{$this->_name}://{$this->_container}/";
+    }
+    
+    /**
+     * Create directory if not exist
+     * 
+     * @param string $path The path being checked. 
+     * @return string The path
+     */
+    public function ensure($path) {
+        return $path;
+    }
+    
+    protected function formatUri($path) {
+        return  $this->getPrefix().str_replace('\\','/',$path);	
     }
 }

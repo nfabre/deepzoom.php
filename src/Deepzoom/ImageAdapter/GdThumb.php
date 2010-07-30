@@ -96,7 +96,10 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
      * @param string $format
      */
     public function save($destination, $format=null) {
-		parent::save($destination, $format);
+    	$tmp = './'.$this->getUniqId().'.'.$this->getFormat();
+		parent::save($tmp , $format);
+		$this->getStreamWrapper()->putContents($destination,file_get_contents($tmp));
+		unlink($tmp);
 		return $this;	
 	}
 	
@@ -154,8 +157,11 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
      *
      * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
      */
-    public function getStreamWrapper()
-    {
+    public function getStreamWrapper() {
         return $this->_streamWrapper;
+    }
+    
+    protected function getUniqId() {
+    	return uniqid('tmp_', true);
     }
 }

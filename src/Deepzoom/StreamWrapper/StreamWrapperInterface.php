@@ -67,4 +67,20 @@ interface StreamWrapperInterface {
 	 * @return bool Returns true on success or false on failure. 
 	 */
 	public function putContents($filename, $data);
+	
+	/**
+     * Create directory if not exist
+     * 
+     * @param string $path The path being checked. 
+     * @return string The path
+     */
+    public function ensure($path) ;
+    
+    /**
+     * Returns information about a file path
+     * 
+     * @param string $path The path being checked. 
+     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
+     */
+    public function getPathInfo($path);
 }
