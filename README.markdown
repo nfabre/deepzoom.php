@@ -19,6 +19,6 @@ Installation
 
   2. Exemple:
 
-        $deep = new ImageCreator(new Descriptor(),new ImageAdapter\GdThumb());
+        $deep = new ImageCreator(new File(),new Descriptor(new File()),new Imagick());
         
         $deep->create(realpath('my/image.jpg'), 'my/deepzoom.dzi');
