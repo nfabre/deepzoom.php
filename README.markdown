@@ -10,6 +10,7 @@ To run the Deepzoom test suite, you need PHPUnit 3.5 or later.
 * Refactoring & PHP 5.3.2
 * Use Dependency Injection (Add Descriptor Interface and Image Adapter Interface)
 * Add "CollectionCreator"                       
+* Add Stream Support, you can create Deep Zoom on Amazon S3 or Microsoft Azure Storage
 
 Installation
 ============
