@@ -95,4 +95,8 @@ class Stub implements StreamWrapperInterface {
         
         return $path;
     }
+    
+   public function getPrefix() {
+        return '';
+    }
 }

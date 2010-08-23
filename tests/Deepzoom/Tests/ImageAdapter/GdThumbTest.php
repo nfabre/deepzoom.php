@@ -3,6 +3,7 @@ namespace Deepzoom\Tests\ImageAdapter;
 
 use Deepzoom\ImageAdapter\GdThumb;
 use Deepzoom\Exception as dzException;
+use Deepzoom\StreamWrapper\File;
 
 /**
 * Deep Zoom Tools
@@ -100,6 +101,7 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     
      public function testSave() {
     	$imageCreator = new GdThumb();	
+    	$imageCreator->setStreamWrapper(new File());
     	$imageCreator->setSource($this->path.'hlegius.jpg');
      	$imageCreator->save($this->path.'hlegius.save.jpg');
      	$this->assertFileExists($this->path.'hlegius.save.jpg');
