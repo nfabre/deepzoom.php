@@ -135,10 +135,20 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	    if($this->newDimensions['newHeight'] == 0) {
           $this->newDimensions['newHeight'] = 1; 
         }
+        return $this->newDimensions;
 	}
 	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param int $width
+	 * @param int $height
+	 * @return Deepzoom\ImageAdapter\GdThumb
+	 * @todo Not used yet
+	 */
 	public function newImage($width,$height) {
 	   $this->oldImage = imagecreate($width, $height);
+	   return $this;
 	}
     
     /**

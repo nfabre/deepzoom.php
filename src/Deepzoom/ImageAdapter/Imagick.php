@@ -47,7 +47,7 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
     /**
      * @var Deepzoom\StreamWrapper\StreamWrapperInterface $_streamWrapper
      */
-    protected $_streamWrapper;
+    protected static $_streamWrapper;
     
 	/**
 	 * Resizes an image to be no larger than $width or $heigh
@@ -56,7 +56,7 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
 	 * @param int $height
 	 */
 	public function resize($width,$height) {
-		$this->scaleImage($width,$height);
+		$this->scaleImage($width,$height,true);
 		return $this;
 	}
 	
@@ -109,8 +109,7 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
      * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
      */
     public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
-        $this->_streamWrapper = $streamWrapper;
-        
+        self::$_streamWrapper = $streamWrapper;
         return $this;   
     }
     
@@ -119,8 +118,7 @@ class Imagick extends \Imagick implements ImageAdapterInterface {
      *
      * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
      */
-    public function getStreamWrapper()
-    {
-        return $this->_streamWrapper;
+    public function getStreamWrapper() {
+        return self::$_streamWrapper;
     }
 }

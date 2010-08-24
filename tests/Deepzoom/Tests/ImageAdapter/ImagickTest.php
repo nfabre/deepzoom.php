@@ -1,7 +1,7 @@
 <?php
 namespace Deepzoom\Tests\ImageAdapter;
 
-use Deepzoom\ImageAdapter\GdThumb;
+use Deepzoom\ImageAdapter\Imagick;
 use Deepzoom\Exception as dzException;
 use Deepzoom\StreamWrapper\File;
 
@@ -45,7 +45,7 @@ use Deepzoom\StreamWrapper\File;
  * @subpackage Test_ImageAdapter
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
-class GdThumbTest extends \PHPUnit_Framework_TestCase
+class ImagickTest extends \PHPUnit_Framework_TestCase
 {
 	static public function setUpBeforeClass()
     {
@@ -63,33 +63,30 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     
 	public function testConstructor()
     {
-        $imageCreator = new GdThumb();
-        $this->assertType('Deepzoom\ImageAdapter\ImageAdapterInterface',$imageCreator, '__construct()'); 
-        $this->assertType('Deepzoom\ImageAdapter\GdThumb',$imageCreator, '__construct()'); 
-        $this->assertType('\GdThumb',$imageCreator, '__construct()'); 
+        $imageCreator = new Imagick();
+        $this->assertInstanceOf('Deepzoom\ImageAdapter\ImageAdapterInterface',$imageCreator, '__construct()'); 
+        $this->assertInstanceOf('Deepzoom\ImageAdapter\Imagick',$imageCreator, '__construct()'); 
+        $this->assertInstanceOf('\Imagick',$imageCreator, '__construct()'); 
     }
     
     public function testSetSource() {
-    	$imageCreator = new GdThumb();	
+    	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
-    	$this->assertAttributeEquals($this->path.'hlegius.jpg','_source',$imageCreator,'setSource()  Set image path');
-    	$this->assertAttributeType('array','currentDimensions',$imageCreator,'setSource()  Set image path');
-    	$this->assertAttributeType('resource','oldImage',$imageCreator,'setSource()  Set image path');
+    	$this->assertStringEndsWith('hlegius.jpg',$imageCreator->getImageFilename(),'setSource()  Set image path');
     }
     
     public function testResize() {
-    	$imageCreator = new GdThumb();	
+    	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$return = $imageCreator->resize(100,100);
     	$this->assertType('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'resize() Resizes an image to be no larger than $width or $height'); 
-    	$this->assertAttributeType('array','currentDimensions',$return,'resize() Resizes an image to be no larger than $width or $height'); 
+    	$this->assertType('array',$return->getDimensions(),'resize() Resizes an image to be no larger than $width or $height'); 
     	// preserve the proportions
-    	$this->assertAttributeEquals(array('width' => 100, 'height' => 74),'currentDimensions',$return,'resize() Resizes an image to be no larger than $width or $height');
-    	$this->assertAttributeType('resource','oldImage',$return,'resize() Resizes an image to be no larger than $width or $height');
+    	$this->assertEquals(array('width' => 100, 'height' => 75),$return->getDimensions(),'resize() Resizes an image to be no larger than $width or $height');
     }
     
     public function testGetDimensions() {
-    	$imageCreator = new GdThumb();	
+    	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$dimensions = $imageCreator->getDimensions();	
     	$this->assertType('array',$dimensions,'->getDimensions() Returns image dimensions');
@@ -100,7 +97,7 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     }
     
      public function testSave() {
-    	$imageCreator = new GdThumb();	
+    	$imageCreator = new Imagick();	
     	$imageCreator->setStreamWrapper(new File());
     	$imageCreator->setSource($this->path.'hlegius.jpg');
      	$imageCreator->save($this->path.'hlegius.save.jpg');
@@ -108,38 +105,16 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
      }
      
       public function testCrop() {
-      	$imageCreator = new GdThumb();	
+      	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$return = $imageCreator->crop(50,50,100,100);
 		$this->assertType('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
-    	$this->assertAttributeType('array','currentDimensions',$return,'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
-    	$this->assertAttributeEquals(array('width' => 100, 'height' => 100),'currentDimensions',$return,'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
-    	$this->assertAttributeType('resource','oldImage',$return,'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
+    	$this->assertEquals(array('width' => 100, 'height' => 100),$return->getDimensions(),'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
       }
       
-      public function testNewImage() {
-        $imageCreator = new GdThumb();  
-        $imageCreator->setStreamWrapper(new File());
-        //$imageCreator->newImage(50,50);
-     }
-     
-     public function testCalcImageSize() {
-        $imageCreator = new GdThumb();  
-        $imageCreator->setSource($this->path.'hlegius.jpg');
-        $method = new \ReflectionMethod(
-          'Deepzoom\ImageAdapter\GdThumb', 'calcImageSize'
-        );
-        $method->setAccessible(TRUE);
-        $result = $method->invoke($imageCreator,0,100);
-        $this->assertType('array',$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
-        $this->assertEquals(array('newWidth' => 1, 'newHeight' => 100),$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
-        
-     }
-      
       public function testGetStreamWrapper() {
-        $imageCreator = new GdThumb();   
-        $imageCreator->setStreamWrapper(new File());
-        $this->assertAttributeType('Deepzoom\StreamWrapper\File','_streamWrapper',$imageCreator);
-        $this->assertInstanceOf('Deepzoom\StreamWrapper\File', $imageCreator->getStreamWrapper());
+      	$imageCreator = new Imagick();   
+      	$imageCreator->setStreamWrapper(new File());
+      	$this->assertInstanceOf('Deepzoom\StreamWrapper\File', $imageCreator->getStreamWrapper());
       }
 }
