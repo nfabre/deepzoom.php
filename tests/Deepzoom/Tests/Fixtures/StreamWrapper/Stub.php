@@ -96,7 +96,17 @@ class Stub implements StreamWrapperInterface {
         return $path;
     }
     
-   public function getPrefix() {
+    public function getPrefix() {
         return '';
+    }
+    
+    /**
+     * Convert the file path into a valid File URI
+     * 
+     * @param string $path
+     * @return string 
+     */
+    public function formatUri($path) {
+        return  $path;
     }
 }
