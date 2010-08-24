@@ -1,10 +1,10 @@
 <?php
 namespace Deepzoom\Console\Command;
 
-use Symfony\Components\Console\Input\InputArgument,
-    Symfony\Components\Console\Input\InputOption,
-    Symfony\Components\Console\Command\Command,
-    Symfony\Components\Console,
+use Symfony\Component\Console\Input\InputArgument,
+    Symfony\Component\Console\Input\InputOption,
+    Symfony\Component\Console\Command\Command,
+    Symfony\Component\Console,
     Deepzoom\ImageCreator,
     Deepzoom\Exception as dzException,
     Deepzoom\ImageAdapter\GdThumb,

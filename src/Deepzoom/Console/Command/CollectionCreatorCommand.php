@@ -1,9 +1,9 @@
 <?php
 namespace Deepzoom\Console\Command;
 
-use Symfony\Components\Console\Input\InputArgument,
-    Symfony\Components\Console\Input\InputOption,
-    Symfony\Components\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument,
+    Symfony\Component\Console\Input\InputOption,
+    Symfony\Component\Console\Command\Command;
 
 /**
 * Deep Zoom Tools
