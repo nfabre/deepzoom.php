@@ -2,9 +2,10 @@
 namespace Deepzoom\Tests\Console\Command;
 
 use Deepzoom\Exception as dzException;
-use Symfony\Components\Console\Application;
-use Symfony\Components\Console\Input;
-use Symfony\Components\Console\Output;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input;
+use Symfony\Component\Console\Output;
+use Deepzoom\Console\Command\ImageCreatorCommand;
 
 /**
 * Deep Zoom Tools
@@ -48,12 +49,13 @@ use Symfony\Components\Console\Output;
  */    
 class ImageCreatorCommandTest extends \PHPUnit_Framework_TestCase {
 	protected $application;
+	
 	public function setUp()
     {
         $this->application = new Application('Deepzoom Command Line Interface', 1);
         $this->application->setCatchExceptions(false);
         $this->application->setAutoExit(false);
-        $this->application->addCommand(new \Deepzoom\Console\Command\ImageCreatorCommand()); 
+        $this->application->addCommand(new ImageCreatorCommand()); 
         $this->path = __DIR__.'/../../Fixtures/';
     }
     

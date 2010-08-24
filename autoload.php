@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/src/vendor/Symfony/Foundation/UniversalClassLoader.php';
+require_once __DIR__.'/src/vendor/Symfony/Framework/UniversalClassLoader.php';
 /**
 * Deep Zoom Tools
 *
@@ -39,7 +39,7 @@ require_once __DIR__.'/src/vendor/Symfony/Foundation/UniversalClassLoader.php';
  * @package    Deepzoom
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */ 
-$loader = new Symfony\Foundation\UniversalClassLoader();
+$loader = new Symfony\Framework\UniversalClassLoader();
 $loader->registerNamespace('Symfony', __DIR__.'/src/vendor');
 $loader->registerNamespace('Zend', __DIR__.'/src/vendor/zf/library');
 $loader->registerNamespace('Imagine', __DIR__.'/src/vendor/imagine/lib');

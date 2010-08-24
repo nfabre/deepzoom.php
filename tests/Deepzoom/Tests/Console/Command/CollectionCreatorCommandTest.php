@@ -1,5 +1,11 @@
-<?php 
-require_once __DIR__.'/../src/vendor/symfony/src/Symfony/Framework/UniversalClassLoader.php';
+<?php
+namespace Deepzoom\Tests\Console\Command;
+
+use Deepzoom\Exception as dzException;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input;
+use Symfony\Component\Console\Output;
+use Deepzoom\Console\Command\CollectionCreatorCommand;
 /**
 * Deep Zoom Tools
 *
@@ -34,22 +40,22 @@ require_once __DIR__.'/../src/vendor/symfony/src/Symfony/Framework/UniversalClas
 */
 
 /**
- * Deepzoom universal loader for tests
+ * Testing Command Line
  *
  * @package    Deepzoom
- * @subpackage Test
+ * @subpackage Test_Command
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
- */ 
-$loader = new Symfony\Framework\UniversalClassLoader();
-$loader->registerNamespace('Symfony', __DIR__.'/../src/vendor/symfony/src/');
-$loader->registerNamespace('Imagine', __DIR__.'/../src/vendor/imagine/lib');
-$loader->registerNamespace('Deepzoom\\Tests', __DIR__);
-$loader->registerNamespace('Deepzoom', __DIR__.'/../src');
-
-$loader->registerPrefixes(array(
-    'Zend_' => __DIR__.'/../src/vendor/zend/lib',
-));
-$loader->register();
-
-// for Zend Framework
-set_include_path(__DIR__.'/../src/vendor/zend/lib'.PATH_SEPARATOR.get_include_path());
+ */    
+class CollectionCreatorCommandTest extends \PHPUnit_Framework_TestCase {
+	protected $application;
+	
+	public function setUp()
+    {
+        $this->application = new Application('Deepzoom Command Line Interface', 1);
+        $this->application->setCatchExceptions(false);
+        $this->application->setAutoExit(false);
+        $this->application->addCommand(new CollectionCreatorCommand()); 
+        $this->path = __DIR__.'/../../Fixtures/';
+    }
+    
+}
