@@ -1,7 +1,5 @@
 <?php
-namespace Deepzoom\StreamWrapper\WindowsAzure;
-
-use Deepzoom\StreamWrapper\StreamWrapperAbstract;
+namespace Deepzoom\StreamWrapper;
 
 /**
 * Deep Zoom Tools
@@ -36,65 +34,55 @@ use Deepzoom\StreamWrapper\StreamWrapperAbstract;
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-class Blob extends StreamWrapperAbstract  {
+/**
+ * StreamWrapper Abstract
+ *
+ * @package    Deepzoom
+ * @subpackage StreamWrapper
+ * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
+ */
+abstract class StreamWrapperAbstract implements StreamWrapperInterface {
+    
     /**
+     * Checks whether a file exists
      * 
-     * @var $_container string
+     * @param string $filename
+     * @retur bool Returns true if the file specified by filename exists; false otherwise. 
      */
-    protected $_container;
+    public function exists($filename) {
+        return file_exists($this->formatUri($filename));
+    }	
     
     /**
-     * @var $_name string
-     */
-    protected $_name;
-    
-    /**
-     * @var $_storageClient Zend_Service_WindowsAzure_Storage_Blob
-     */
-    protected $_storageClient;
-    
-    /**
+     * Write a string to a file
      * 
-     * @param Zend_Service_WindowsAzure_Storage_Blob $blobStorage
-     * @param string $container
-     * @param string $name
+     * @param string $filename
+     * @param mixed $data
+     * @return bool Returns true on success or false on failure. 
      */
-    public function __construct(\Zend_Service_WindowsAzure_Storage_Blob $blobStorage, $container,$name = 'azure') {
-        $this->_container = $container;
-        $this->_name = $name;
-        $this->_storageClient = $blobStorage;
-        $existed = in_array('azure', stream_get_wrappers());
-        if ($existed === false) {
-            $this->_storageClient->registerStreamWrapper();
-        }
+    public function putContents($filename, $data) {
+        $result = file_put_contents($this->formatUri($filename), $data);
+        
+        return $result > 0 ? true : false;
     }
     
     /**
-     * Convert the file path into a valid Windows Azure URI
-     *
-     * @return string 
+     * Reads entire file into a string
+     * 
+     * @param string $filename
+     * @returnstring returns the file in a string
      */
-    public function getPrefix() {
-        return "{$this->_name}://{$this->_container}/";
+    public function getContents($filename){
+        return file_get_contents($this->formatUri($filename));
     }
     
     /**
-     * Create directory if not exist
+     * Returns information about a file path
      * 
      * @param string $path The path being checked. 
-     * @return string The path
+     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
      */
-    public function ensure($path) {
-        return $path;
-    }
-    
-    /**
-     * Convert the file path into a valid Windows Azure URI
-     * 
-     * @param string $path
-     * @return string 
-     */
-    public function formatUri($path) {
-        return  $this->getPrefix().str_replace('\\','/',$path); 
+    public function getPathInfo($path) {
+        return pathinfo($path);
     }
 }

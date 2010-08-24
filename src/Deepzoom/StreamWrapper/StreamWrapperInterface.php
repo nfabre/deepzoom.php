@@ -83,4 +83,12 @@ interface StreamWrapperInterface {
      * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
      */
     public function getPathInfo($path);
+    
+    /**
+     * Convert the path into a valid URI
+     * 
+     * @param string $path
+     * @return string 
+     */
+    public function formatUri($path);
 }

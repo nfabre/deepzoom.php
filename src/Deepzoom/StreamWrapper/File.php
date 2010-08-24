@@ -34,52 +34,7 @@ namespace Deepzoom\StreamWrapper;
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-class File implements StreamWrapperInterface {
-
-    /**
-     * Checks whether a file exists
-     * 
-     * @param string $filename
-     * @retur bool Returns true if the file specified by filename exists; false otherwise. 
-     */
-    public function exists($filename) {
-    	return file_exists($filename);
-    }
-    
-    /**
-     * Reads entire file into a string
-     * 
-     * @param string $filename
-     * @returnstring returns the file in a string
-     */
-    public function getContents($filename){
-    	return file_get_contents($filename);
-    }
-    
-    /**
-     * Write a string to a file
-     * 
-     * @param string $filename
-     * @param mixed $data
-     * @return bool Returns true on success or false on failure. 
-     */
-    public function putContents($filename, $data) {
-    	$result = file_put_contents($filename, $data);
-    	
-    	return $result > 0 ? true : false;
-    }
-    
-    /**
-     * Returns information about a file path
-     * 
-     * @param string $path The path being checked. 
-     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
-     */
-    public function getPathInfo($path) {
-    	return pathinfo($path);
-    }
-    
+class File extends StreamWrapperAbstract  {
     /**
      * Create directory if not exist
      * 
@@ -94,7 +49,13 @@ class File implements StreamWrapperInterface {
         return $path;
     }
     
-    public function getPrefix() {
-    	return '';
+    /**
+     * Convert the file path into a valid File URI
+     * 
+     * @param string $path
+     * @return string 
+     */
+    public function formatUri($path) {
+        return  $path;
     }
 }

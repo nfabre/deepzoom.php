@@ -1,7 +1,7 @@
 <?php
 namespace Deepzoom\StreamWrapper\Amazon;
 
-use  Deepzoom\StreamWrapper\StreamWrapperInterface;
+use  Deepzoom\StreamWrapper\StreamWrapperAbstract;
 /**
 * Deep Zoom Tools
 *
@@ -35,8 +35,7 @@ use  Deepzoom\StreamWrapper\StreamWrapperInterface;
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-class S3 implements StreamWrapperInterface {
+class S3 extends StreamWrapperAbstract  {
     /**
      * 
      * @var $_container string
@@ -55,58 +54,25 @@ class S3 implements StreamWrapperInterface {
     
     /**
      * 
+     * @param Zend_Service_Amazon_S3 $blobStorage
      * @param string $container
      * @param string $name
      */
-    public function __construct($container,$name = 's3',$accessKey=null, $secretKey=null, $region=null) {
+    public function __construct(\Zend_Service_Amazon_S3 $blobStorage, $container,$name = 's3') {
         $this->_container = $container;
         $this->_name = $name;
-        $this->_storageClient = new \Zend_Service_Amazon_S3($accessKey, $secretKey, $region);
-        $this->_storageClient->registerStreamWrapper();
-    }
-    /**
-     * Checks whether a file exists
-     * 
-     * @param string $filename
-     * @retur bool Returns true if the file specified by filename exists; false otherwise. 
-     */
-    public function exists($filename) {
-        return file_exists($this->formatUri($filename));
+        $this->_storageClient = $blobStorage;
+        $existed = in_array('s3', stream_get_wrappers());
+        if ($existed === false) {
+            $this->_storageClient->registerStreamWrapper();
+        }
     }
     
     /**
-     * Reads entire file into a string
-     * 
-     * @param string $filename
-     * @returnstring returns the file in a string
+     * Convert the file path into a valid Amazon S3 URI
+     *
+     * @return string 
      */
-    public function getContents($filename){
-        return file_get_contents($this->formatUri($filename));
-    }
-    
-    /**
-     * Write a string to a file
-     * 
-     * @param string $filename
-     * @param mixed $data
-     * @return bool Returns true on success or false on failure. 
-     */
-    public function putContents($filename, $data) {
-        $result = file_put_contents($this->formatUri($filename), $data);
-        
-        return $result > 0 ? true : false;
-    }
-    
-    /**
-     * Returns information about a file path
-     * 
-     * @param string $path The path being checked. 
-     * @return array The following associative array elements are returned: dirname, basename, extension (if any), and filename. 
-     */
-    public function getPathInfo($path) {
-        return pathinfo($path);
-    }
-    
     public function getPrefix() {
         return "{$this->_name}://{$this->_container}/";
     }
@@ -121,7 +87,13 @@ class S3 implements StreamWrapperInterface {
         return $path;
     }
     
-    protected function formatUri($path) {
+    /**
+     * Convert the file path into a valid Amazon S3 URI
+     * 
+     * @param string $path
+     * @return string 
+     */
+    public function formatUri($path) {
         return  $this->getPrefix().str_replace('\\','/',$path); 
     }
 }
