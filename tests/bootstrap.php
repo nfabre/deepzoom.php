@@ -1,5 +1,4 @@
 <?php 
-require_once __DIR__.'/../src/vendor/symfony/src/Symfony/Framework/UniversalClassLoader.php';
 /**
 * Deep Zoom Tools
 *
@@ -33,23 +32,8 @@ require_once __DIR__.'/../src/vendor/symfony/src/Symfony/Framework/UniversalClas
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
- * Deepzoom universal loader for tests
- *
- * @package    Deepzoom
- * @subpackage Test
- * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
- */ 
-$loader = new Symfony\Framework\UniversalClassLoader();
-$loader->registerNamespace('Symfony', __DIR__.'/../src/vendor/symfony/src/');
-$loader->registerNamespace('Imagine', __DIR__.'/../src/vendor/imagine/lib');
-$loader->registerNamespace('Deepzoom\\Tests', __DIR__);
-$loader->registerNamespace('Deepzoom', __DIR__.'/../src');
-
-$loader->registerPrefixes(array(
-    'Zend_' => __DIR__.'/../src/vendor/zend/lib',
-));
-$loader->register();
-
-// for Zend Framework
-set_include_path(__DIR__.'/../src/vendor/zend/lib'.PATH_SEPARATOR.get_include_path());
+if (file_exists($file = __DIR__.'/../autoload.php')) {
+    require_once $file;
+} elseif (file_exists($file = __DIR__.'/../autoload.php.dist')) {
+    require_once $file;
+}

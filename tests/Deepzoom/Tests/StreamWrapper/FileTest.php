@@ -48,10 +48,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 {
     static public function setUpBeforeClass()
     {
+    	
     }
 
     public function setUp()
     {
+    	
       $this->path = __DIR__.'/../Fixtures/';
       if(file_exists($this->path.'NOTExist')) {
         rmdir($this->path.'NOTExist');
@@ -105,7 +107,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $fileWrapper = new File();  
         $infos = $fileWrapper->getPathInfo($this->path.'model1.xml');
         
-        $this->assertType('array', $infos);
+        $this->assertInternalType('array', $infos);
         $this->assertArrayHasKey('dirname',$infos);
         $this->assertArrayHasKey('basename',$infos);
         $this->assertArrayHasKey('extension',$infos);

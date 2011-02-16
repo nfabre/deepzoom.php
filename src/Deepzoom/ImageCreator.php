@@ -106,7 +106,7 @@ class ImageCreator extends AbstractCreator {
             }
             else {
             	$image = clone $this->_imageAdapter;
-             	return $image->resize($dimension['width'],$dimension['height']);
+             	return $image->resizePx($dimension['width'],$dimension['height']);
             }
         } else throw new Exception('Invalid pyramid level');
     } 

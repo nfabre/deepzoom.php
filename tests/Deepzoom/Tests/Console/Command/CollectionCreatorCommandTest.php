@@ -51,11 +51,16 @@ class CollectionCreatorCommandTest extends \PHPUnit_Framework_TestCase {
 	
 	public function setUp()
     {
+    	$this->markTestSkipped("Not implemented");
         $this->application = new Application('Deepzoom Command Line Interface', 1);
         $this->application->setCatchExceptions(false);
         $this->application->setAutoExit(false);
         $this->application->addCommand(new CollectionCreatorCommand()); 
         $this->path = __DIR__.'/../../Fixtures/';
+    }
+    
+    public function testConstruct() {
+    	
     }
     
 }

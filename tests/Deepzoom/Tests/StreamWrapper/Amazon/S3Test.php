@@ -52,10 +52,10 @@ class S3Test extends \PHPUnit_Framework_TestCase
     static public function setUpBeforeClass()
     {
     	self::$blobConfig = array(
-           'container'       => 'phpunitcontainer',     
-           'accessKey'       => 'ACCESSKEY',     
-           'secretAccessKey' => 'SECRETACCESSKEY',     
-           'name'            => 's3',     
+           'container'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_CONTAINER,     
+           'accessKey'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_ACCESSKEY,     
+           'secretAccessKey' => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_SECRETACCESSKEY,     
+           'name'            => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_NAME,     
         );
         self::$blobStorage = new \Zend_Service_Amazon_S3(self::$blobConfig['accessKey'],self::$blobConfig['secretAccessKey']);
         if(!self::$blobStorage->isBucketAvailable(self::$blobConfig['container'])){
@@ -112,10 +112,13 @@ class S3Test extends \PHPUnit_Framework_TestCase
      }
      
      public function testGetPathInfo() {
+     	/**
+		 * @var $blobWrapper Deepzoom\StreamWrapper\Amazon\S3
+     	 */
         $blobWrapper = $this->getWrapperInstance();
      	$infos = $blobWrapper->getPathInfo($this->path.'/model1.xml');
         
-        $this->assertType('array', $infos);
+        $this->assertInternalType('array', $infos);
         $this->assertArrayHasKey('dirname',$infos);
         $this->assertArrayHasKey('basename',$infos);
         $this->assertArrayHasKey('extension',$infos);

@@ -53,6 +53,9 @@ class ImagickTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+      if(!extension_loaded('imagick')) {
+      	$this->markTestSkipped('Extension Imagick not loaded');	
+      }
       $this->path = __DIR__.'/../Fixtures/';
     }
     
@@ -79,8 +82,8 @@ class ImagickTest extends \PHPUnit_Framework_TestCase
     	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$return = $imageCreator->resize(100,100);
-    	$this->assertType('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'resize() Resizes an image to be no larger than $width or $height'); 
-    	$this->assertType('array',$return->getDimensions(),'resize() Resizes an image to be no larger than $width or $height'); 
+    	$this->assertInstanceOf('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'resize() Resizes an image to be no larger than $width or $height'); 
+    	$this->assertInternalType('array',$return->getDimensions(),'resize() Resizes an image to be no larger than $width or $height'); 
     	// preserve the proportions
     	$this->assertEquals(array('width' => 100, 'height' => 75),$return->getDimensions(),'resize() Resizes an image to be no larger than $width or $height');
     }
@@ -89,7 +92,7 @@ class ImagickTest extends \PHPUnit_Framework_TestCase
     	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$dimensions = $imageCreator->getDimensions();	
-    	$this->assertType('array',$dimensions,'->getDimensions() Returns image dimensions');
+    	$this->assertInternalType('array',$dimensions,'->getDimensions() Returns image dimensions');
     	$this->assertArrayHasKey('height',$dimensions,'->getDimensions() Returns image dimensions');
     	$this->assertArrayHasKey('width',$dimensions,'->getDimensions() Returns image dimensions');
     	$this->assertEquals(array('width' => 2048, 'height' => 1536),$dimensions,'->getDimensions() Returns image dimensions');
@@ -97,6 +100,7 @@ class ImagickTest extends \PHPUnit_Framework_TestCase
     }
     
      public function testSave() {
+     	unlink($this->path.'hlegius.save.jpg');
     	$imageCreator = new Imagick();	
     	$imageCreator->setStreamWrapper(new File());
     	$imageCreator->setSource($this->path.'hlegius.jpg');
@@ -108,7 +112,7 @@ class ImagickTest extends \PHPUnit_Framework_TestCase
       	$imageCreator = new Imagick();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
     	$return = $imageCreator->crop(50,50,100,100);
-		$this->assertType('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
+		$this->assertInstanceOf('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
     	$this->assertEquals(array('width' => 100, 'height' => 100),$return->getDimensions(),'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
       }
       

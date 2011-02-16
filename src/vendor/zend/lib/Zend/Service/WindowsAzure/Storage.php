@@ -381,13 +381,12 @@ class Zend_Service_WindowsAzure_Storage
 						  ->signRequestUrl($this->getBaseUrl() . $path . $queryString, $resourceType, $requiredPermission);
 		$requestHeaders = $this->_credentials
 						  ->signRequestHeaders($httpVerb, $path, $queryString, $headers, $forTableStorage, $resourceType, $requiredPermission);
-
 		// Prepare request
 		$this->_httpClientChannel->resetParameters(true);
 		$this->_httpClientChannel->setUri($requestUrl);
+		
 		$this->_httpClientChannel->setHeaders($requestHeaders);
 		$this->_httpClientChannel->setRawData($rawData);
-		
 		// Execute request
 		$response = $this->_retryPolicy->execute(
 		    array($this->_httpClientChannel, 'request'),

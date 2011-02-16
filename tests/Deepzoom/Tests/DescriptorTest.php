@@ -63,17 +63,17 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(256, $descriptor->getTileSize(), '__construct() takes the tile size as its first argument');
         $this->assertEquals(0, $descriptor->getTileOverlap(), '__construct() takes the tile overlap as its first argument');
         $this->assertEquals('png', $descriptor->getTileFormat(), '__construct() takes the tile format as its first argument');
-         $this->assertAttributeType('Deepzoom\StreamWrapper\StreamWrapperInterface','_streamWrapper',$descriptor, '__construct() takes the tile size as its first argument');
+         $this->assertAttributeInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface','_streamWrapper',$descriptor, '__construct() takes the tile size as its first argument');
     }
     
-    public function testOpen()
+    public function testOpenFile()
     {
     	$descriptor = new Descriptor(new File());
     	$descriptor->open($this->path.'model1.xml');
     	$this->assertTrue(true);
     }
     
-	public function testOpenFail()
+	public function testOpenFileButDeepzoomException()
     {
     	$descriptor = new Descriptor(new File());
     	try {
@@ -83,7 +83,7 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     	}
     }
     
-	public function testSave()
+	public function testSaveFile()
     {
     	$descriptor = new Descriptor(new File());
     	$descriptor->open($this->path.'model1.xml');
@@ -156,8 +156,8 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     public function testGetStreamWrapper(){
          $descriptor = new Descriptor(new streamStub());  
          $descriptor->setStreamWrapper(new File());
-         $this->assertType('Deepzoom\StreamWrapper\StreamWrapperInterface',$descriptor->getStreamWrapper());
-         $this->assertType('Deepzoom\StreamWrapper\File',$descriptor->getStreamWrapper());
+         $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface',$descriptor->getStreamWrapper());
+         $this->assertInstanceOf('Deepzoom\StreamWrapper\File',$descriptor->getStreamWrapper());
     }
     
     public function testGetScaleException(){
@@ -184,7 +184,7 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
 		foreach (range(0,11) as $level) {
 			$this->assertEquals(array('width', 'height'), array_keys($descriptor->getDimension($level)), '->getDimension() gets the dimension of a pyramid level');
-    	 	$this->assertType('array',$descriptor->getDimension($level), '->getDimension() gets the dimension of a pyramid level');
+    	 	$this->assertInternalType('array',$descriptor->getDimension($level), '->getDimension() gets the dimension of a pyramid level');
     	 }
     }
     
@@ -202,7 +202,7 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
     	 foreach (range(0,11) as $level) {
     	 	$this->assertEquals(array('columns', 'rows'), array_keys($descriptor->getNumTiles($level)), '->getNumTiles() gets the number of tiles in a pyramid level');
-    	 	$this->assertType('array',$descriptor->getNumTiles($level), '->getNumTiles() gets the number of tiles in a pyramid level');
+    	 	$this->assertInternalType('array',$descriptor->getNumTiles($level), '->getNumTiles() gets the number of tiles in a pyramid level');
 			$tiles = $descriptor->getNumTiles($level);
     	 	$this->assertGreaterThan(0,$tiles['columns'], '->getNumTiles() gets the number of tiles in a pyramid level');	
 			$this->assertGreaterThan(0,$tiles['rows'], '->getNumTiles() gets the number of tiles in a pyramid level');

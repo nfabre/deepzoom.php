@@ -52,23 +52,31 @@ class BlobTest extends \PHPUnit_Framework_TestCase
     static public function setUpBeforeClass()
     {
     	self::$blobConfig = array(
-           'container'  => 'phpunitcontainer',     
-           'host'       => 'blob.core.windows.net',     
-           'account'    => '<ACCOUNT>',     
-           'credencial' => '<CREDENCIAL>',     
-           'name'       => 'azure',     
+           'container'  => DEEPZOOM_TESTSUITE_STREAMWRAPPER_CONTAINER,     
+           'host'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_HOST,     
+           'account'    => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_ACCOUNT,     
+           'credencial' => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_CREDENCIAL,     
+           'name'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_NAME,    
         );
+        
+       
+        
         self::$blobStorage = new \Zend_Service_WindowsAzure_Storage_Blob(self::$blobConfig['host'],self::$blobConfig['account'],self::$blobConfig['credencial']);
-        if(!self::$blobStorage->containerExists(self::$blobConfig['container'])){
-            self::$blobStorage->createContainer(self::$blobConfig['container']);
-            self::$blobStorage->setContainerAcl(self::$blobConfig['container'], \Zend_Service_WindowsAzure_Storage_Blob::ACL_PUBLIC);    
+        if(!empty(self::$blobConfig['account']) && !empty(self::$blobConfig['credencial']) ) {     
+	        if(!self::$blobStorage->containerExists(self::$blobConfig['container'])){
+	            self::$blobStorage->createContainer(self::$blobConfig['container']);
+	            self::$blobStorage->setContainerAcl(self::$blobConfig['container'], \Zend_Service_WindowsAzure_Storage_Blob::ACL_PUBLIC);    
+	        }
+	        self::$blobStorage->putBlob(self::$blobConfig['container'], 'mypath/model1.xml', __DIR__.'/../../Fixtures/model1.xml' );
+    
         }
-          	
-        self::$blobStorage->putBlob(self::$blobConfig['container'], 'mypath/model1.xml', __DIR__.'/../../Fixtures/model1.xml' );
     }
-
+    
     public function setUp()
     {
+    	 if(empty(self::$blobConfig['account']) || empty(self::$blobConfig['credencial']) ) {
+        	$this->markTestSkipped('Windows Azure is not properly configured');	
+        }
         $this->path = 'mypath';
     }
     
@@ -116,7 +124,7 @@ class BlobTest extends \PHPUnit_Framework_TestCase
         $blobWrapper = $this->getWrapperInstance();
      	$infos = $blobWrapper->getPathInfo($this->path.'/model1.xml');
         
-        $this->assertType('array', $infos);
+        $this->assertInternalType('array', $infos);
         $this->assertArrayHasKey('dirname',$infos);
         $this->assertArrayHasKey('basename',$infos);
         $this->assertArrayHasKey('extension',$infos);

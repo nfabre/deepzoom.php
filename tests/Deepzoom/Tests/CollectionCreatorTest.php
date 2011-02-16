@@ -74,8 +74,8 @@ class CollectionCreatorTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $collectionCreator = new CollectionCreator(new Descriptor(new streamStub()),new GdThumb(),10,'png',3);
-        $this->assertAttributeType('Deepzoom\DescriptorInterface','_descriptor',$collectionCreator, '__construct() takes the tile size as its first argument'); 
-        $this->assertAttributeType('Deepzoom\ImageAdapter\ImageAdapterInterface','_imageAdapter',$collectionCreator, '__construct() takes the tile size as its first argument'); 
+        $this->assertAttributeInstanceOf('Deepzoom\DescriptorInterface','_descriptor',$collectionCreator, '__construct() takes the tile size as its first argument'); 
+        $this->assertAttributeInstanceOf('Deepzoom\ImageAdapter\ImageAdapterInterface','_imageAdapter',$collectionCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeEquals(10,'_tileSize',$collectionCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeEquals('png','_tileFormat',$collectionCreator, '__construct() takes the tile size as its first argument'); 
         $this->assertAttributeEquals(3,'_maxLevel',$collectionCreator, '__construct() takes the tile size as its first argument'); 

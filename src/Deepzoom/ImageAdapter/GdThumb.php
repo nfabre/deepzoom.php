@@ -68,6 +68,7 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	public function setSource($source) {
 		$this->_source = $source;
 		parent::__construct($source);
+		return $this;
 	}
  	
 	/**
@@ -76,7 +77,7 @@ class GdThumb extends \GdThumb implements ImageAdapterInterface {
 	 * @param int $width
 	 * @param int $height
 	 */
-	public function resize($width, $height) {
+	public function resizePx($width, $height) {
 		parent::resize($width,$height);
 		return $this;	
 	}

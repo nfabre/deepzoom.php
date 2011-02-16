@@ -178,7 +178,6 @@ class Zend_Service_WindowsAzure_Storage_Blob extends Zend_Service_WindowsAzure_S
 		if (!self::isValidContainerName($containerName)) {
 		    throw new Zend_Service_WindowsAzure_Exception('Container name does not adhere to container naming conventions. See http://msdn.microsoft.com/en-us/library/dd135715.aspx for more information.');
 		}
-			
 		// List containers
         $containers = $this->listContainers($containerName, 1);
         foreach ($containers as $container) {

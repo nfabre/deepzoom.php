@@ -1,7 +1,11 @@
 <?php
 namespace Deepzoom\ImageAdapter; 
 
-use Deepzoom\StreamWrapper\StreamWrapperInterface;
+use Imagine\GD\Command\Resize;
+
+use \Deepzoom\StreamWrapper\StreamWrapperInterface;
+use \Imagine\Image;
+use \Imagine\Processor;
 /**
 * Deep Zoom Tools
 *
@@ -36,28 +40,51 @@ use Deepzoom\StreamWrapper\StreamWrapperInterface;
 */
 
 /**
- * ImageAdapter Interface 
+ * Imagick Adapter 
  *
  * @package    Deepzoom
  * @subpackage ImageAdapter
  * @author     Nicolas Fabre <nicolas.fabre@gmail.com>
  */
-interface ImageAdapterInterface {
-
+class Imagine extends Image  implements ImageAdapterInterface {
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var \Imagine\Image
+	 */
+    protected $_image;
+    /**
+     * @var Deepzoom\StreamWrapper\StreamWrapperInterface $_streamWrapper
+     */
+    protected $_streamWrapper;
+    
+    public function  __construct() {
+    	
+    }
+    
 	/**
 	 * Resizes an image to be no larger than $width or $heigh
 	 * 
 	 * @param int $width
 	 * @param int $height
 	 */
-	public function resizePx($width,$height);
+	public function resize($width,$height) {
+		$processor = new Processor();
+		$processor
+		    ->resize($width,$height,Resize::AR_WITHIN)
+		    ->process($this);	
+		return $this;
+	}
 	
 	/**
 	 * Returns image dimensions
 	 * 
 	 * return array
 	 */
-	public function getDimensions();
+	public function getDimensions() {
+		return array('width' => $this->getWidth(), 'height' => $this->getHeight());	
+	}
 	
 	/**
 	 * Cropping function that crops an image using $startX and $startY as the upper-left hand corner
@@ -67,7 +94,13 @@ interface ImageAdapterInterface {
 	 * @param int $width
 	 * @param int $height
 	 */
-	public function crop($startX,$startY,$width,$height);
+	public function crop($startX,$startY,$width,$height) {
+		$processor = new Processor();
+		$processor
+		    ->crop($startX,$startY,$width,$height)
+		    ->process($this);
+		return $this;	    			
+	}
 	
 	/**
 	 * Saves an image
@@ -75,26 +108,51 @@ interface ImageAdapterInterface {
 	 * @param string $destination
 	 * @param string $format
 	 */
-	public function save($destination, $format=null);
+	public function save($destination, $format=null) {
+		$tmp = './'.$this->getUniqId().'.'.$this->getType();
+		$processor = new Processor();
+		$processor
+		    ->save($tmp)
+		    ->process($this);
+		$this->getStreamWrapper()->putContents($destination,file_get_contents($tmp));
+		unlink($tmp);
+		return $this;		
+	}
 	
 	/**
 	 * Image path
 	 * 
 	 * @param strung $destination
 	 */
-	public function setSource($path);
+	public function setSource($path) {
+		parent::__construct($path);
+		return $this;
+	}
 	
 	/**
      * Sets the stream wrapper
      *
      * @param \Deepzoom\StreamWrapper\StreamWrapperInterface $streamWrapper
      */
-    public function setStreamWrapper(StreamWrapperInterface $streamWrapper);
+    public function setStreamWrapper(StreamWrapperInterface $streamWrapper) {
+    	$this->_streamWrapper =$streamWrapper;
+    	return $this;	
+    }
     
     /**
      * Gets the stream wrapper
      *
      * @return \Deepzoom\StreamWrapper\StreamWrapperInterface stream wrapper
      */
-    public function getStreamWrapper();
+    public function getStreamWrapper() {
+    	return $this->_streamWrapper;	
+    }	
+    
+    public function getImageFilename() {
+    	return $this->getPath();
+    }
+    
+    protected function getUniqId() {
+    	return uniqid('tmp_', true);
+    }
 }

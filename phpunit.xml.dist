@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false" backupStaticAttributes="false"
+	colors="false" convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true" convertWarningsToExceptions="true"
+	processIsolation="false" stopOnFailure="true" syntaxCheck="false"
+	bootstrap="tests/bootstrap.php">
+    
+    <php>
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_CONTAINER" value="phpunitcontainer" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_ACCESSKEY" value="AKIAIA6FCTSAGBDW2WUQ" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_SECRETACCESSKEY" value="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" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_NAME" value="s3" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_HOST" value="blob.core.windows.net" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_ACCOUNT" value="" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_CREDENCIAL" value="" />
+        <const name="DEEPZOOM_TESTSUITE_STREAMWRAPPER_AZURE_NAME" value="azure" />
+    </php>
+	
+	<testsuites>
+		<testsuite name="Deepzoom Test Suite">
+			<directory>./tests/Deepzoom/</directory>
+		</testsuite>
+	</testsuites>
+<!-- 
+	<logging>
+		<log type="coverage-html" target="build/coverage" title="DeepZoom PHP"
+			charset="UTF-8" yui="true" highlight="true" lowUpperBound="35"
+			highLowerBound="70" />
+		<log type="coverage-clover" target="build/logs/clover.xml"/> <log 
+			type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/> 
+	</logging>
+-->
+	<filter>
+		<whitelist addUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">./src/Deepzoom/</directory>
+		</whitelist>
+	</filter>
+</phpunit>

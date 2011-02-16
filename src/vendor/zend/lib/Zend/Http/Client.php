@@ -268,7 +268,7 @@ class Zend_Http_Client
         if (is_string($uri)) {
             $uri = Zend_Uri::factory($uri);
         }
-
+		
         if (!$uri instanceof Zend_Uri_Http) {
             /** @see Zend_Http_Client_Exception */
             require_once 'Zend/Http/Client/Exception.php';
