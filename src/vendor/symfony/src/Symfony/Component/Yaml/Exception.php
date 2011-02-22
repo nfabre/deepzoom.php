@@ -1,7 +1,5 @@
 <?php
 
-namespace Symfony\Component\Yaml;
-
 /*
  * This file is part of the Symfony package.
  *
@@ -11,10 +9,12 @@ namespace Symfony\Component\Yaml;
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Yaml;
+
 /**
  * Exception class used by all exceptions thrown by the component.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Exception extends \Exception
 {

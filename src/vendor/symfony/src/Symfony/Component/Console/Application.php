@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,15 +27,6 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 
-/*
- * This file is part of the Symfony framework.
- *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 /**
  * An Application is the container for a collection of commands.
  *
@@ -37,10 +37,10 @@ use Symfony\Component\Console\Helper\DialogHelper;
  * Usage:
  *
  *     $app = new Application('myapp', '1.0 (stable)');
- *     $app->addCommand(new SimpleCommand());
+ *     $app->add(new SimpleCommand());
  *     $app->run();
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Application
 {
@@ -74,18 +74,18 @@ class Application
             new DialogHelper(),
         ));
 
-        $this->addCommand(new HelpCommand());
-        $this->addCommand(new ListCommand());
+        $this->add(new HelpCommand());
+        $this->add(new ListCommand());
 
         $this->definition = new InputDefinition(array(
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
 
-            new InputOption('--help',           '-h', InputOption::PARAMETER_NONE, 'Display this help message.'),
-            new InputOption('--quiet',          '-q', InputOption::PARAMETER_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v', InputOption::PARAMETER_NONE, 'Increase verbosity of messages.'),
-            new InputOption('--version',        '-V', InputOption::PARAMETER_NONE, 'Display this program version.'),
-            new InputOption('--ansi',           '-a', InputOption::PARAMETER_NONE, 'Force ANSI output.'),
-            new InputOption('--no-interaction', '-n', InputOption::PARAMETER_NONE, 'Do not ask any interactive question.'),
+            new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+            new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
+            new InputOption('--verbose',        '-v', InputOption::VALUE_NONE, 'Increase verbosity of messages.'),
+            new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this program version.'),
+            new InputOption('--ansi',           '-a', InputOption::VALUE_NONE, 'Force ANSI output.'),
+            new InputOption('--no-interaction', '-n', InputOption::VALUE_NONE, 'Do not ask any interactive question.'),
         ));
     }
 
@@ -123,6 +123,9 @@ class Application
         }
 
         if ($this->autoExit) {
+            if ($statusCode > 255) {
+                $statusCode = 255;
+            }
             // @codeCoverageIgnoreStart
             exit($statusCode);
             // @codeCoverageIgnoreEnd
@@ -147,7 +150,7 @@ class Application
             $output->setDecorated(true);
         }
 
-        if (true === $input->hasParameterOption(array('--help', '-H'))) {
+        if (true === $input->hasParameterOption(array('--help', '-h'))) {
             if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(array('command' => 'help'));
@@ -178,7 +181,7 @@ class Application
         }
 
         // the command name MUST be the first element of the input
-        $command = $this->findCommand($name);
+        $command = $this->find($name);
 
         $this->runningCommand = $command;
         $statusCode = $command->run($input, $output);
@@ -198,7 +201,7 @@ class Application
     }
 
     /**
-     * Get the helper set associated with the command
+     * Get the helper set associated with the command.
      *
      * @return HelperSet The HelperSet instance associated with this command
      */
@@ -326,7 +329,7 @@ class Application
      */
     public function register($name)
     {
-        return $this->addCommand(new Command($name));
+        return $this->add(new Command($name));
     }
 
     /**
@@ -337,7 +340,7 @@ class Application
     public function addCommands(array $commands)
     {
         foreach ($commands as $command) {
-            $this->addCommand($command);
+            $this->add($command);
         }
     }
 
@@ -350,7 +353,7 @@ class Application
      *
      * @return Command The registered command
      */
-    public function addCommand(Command $command)
+    public function add(Command $command)
     {
         $command->setApplication($this);
 
@@ -372,7 +375,7 @@ class Application
      *
      * @throws \InvalidArgumentException When command name given does not exist
      */
-    public function getCommand($name)
+    public function get($name)
     {
         if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
             throw new \InvalidArgumentException(sprintf('The command "%s" does not exist.', $name));
@@ -383,7 +386,7 @@ class Application
         if ($this->wantHelps) {
             $this->wantHelps = false;
 
-            $helpCommand = $this->getCommand('help');
+            $helpCommand = $this->get('help');
             $helpCommand->setCommand($command);
 
             return $helpCommand;
@@ -393,13 +396,13 @@ class Application
     }
 
     /**
-     * Returns true if the command exists, false otherwise
+     * Returns true if the command exists, false otherwise.
      *
      * @param string $name The command name or alias
      *
      * @return Boolean true if the command exists, false otherwise
      */
-    public function hasCommand($name)
+    public function has($name)
     {
         return isset($this->commands[$name]) || isset($this->aliases[$name]);
     }
@@ -426,6 +429,8 @@ class Application
     /**
      * Finds a registered namespace by a name or an abbreviation.
      *
+     * @param string $namespace A namespace or abbreviation to search for
+     *
      * @return string A registered namespace
      *
      * @throws \InvalidArgumentException When namespace is incorrect or ambiguous
@@ -448,7 +453,7 @@ class Application
     /**
      * Finds a command by name or alias.
      *
-     * Contrary to getCommand, this command tries to find the best
+     * Contrary to get, this command tries to find the best
      * match if you give it an abbreviation of a name or alias.
      *
      * @param  string $name A command name or a command alias
@@ -457,7 +462,7 @@ class Application
      *
      * @throws \InvalidArgumentException When command name is incorrect or ambiguous
      */
-    public function findCommand($name)
+    public function find($name)
     {
         // namespace
         $namespace = '';
@@ -478,7 +483,7 @@ class Application
 
         $abbrevs = static::getAbbreviations($commands);
         if (isset($abbrevs[$name]) && 1 == count($abbrevs[$name])) {
-            return $this->getCommand($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
+            return $this->get($namespace ? $namespace.':'.$abbrevs[$name][0] : $abbrevs[$name][0]);
         }
 
         if (isset($abbrevs[$name]) && count($abbrevs[$name]) > 1) {
@@ -497,7 +502,7 @@ class Application
             throw new \InvalidArgumentException(sprintf('Command "%s" is ambiguous (%s).', $fullName, $this->getAbbreviationSuggestions($abbrevs[$fullName])));
         }
 
-        return $this->getCommand($abbrevs[$fullName][0]);
+        return $this->get($abbrevs[$fullName][0]);
     }
 
     /**
@@ -509,7 +514,7 @@ class Application
      *
      * @return array An array of Command instances
      */
-    public function getCommands($namespace = null)
+    public function all($namespace = null)
     {
         if (null === $namespace) {
             return $this->commands;
@@ -563,7 +568,7 @@ class Application
      */
     public function asText($namespace = null)
     {
-        $commands = $namespace ? $this->getCommands($this->findNamespace($namespace)) : $this->commands;
+        $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
 
         $messages = array($this->getHelp(), '');
         if ($namespace) {
@@ -604,7 +609,7 @@ class Application
      */
     public function asXml($namespace = null, $asDom = false)
     {
-        $commands = $namespace ? $this->getCommands($this->findNamespace($namespace)) : $this->commands;
+        $commands = $namespace ? $this->all($this->findNamespace($namespace)) : $this->commands;
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
@@ -615,19 +620,22 @@ class Application
         if ($namespace) {
             $commandsXML->setAttribute('namespace', $namespace);
         } else {
-            $xml->appendChild($namespacesXML = $dom->createElement('namespaces'));
+            $namespacesXML = $dom->createElement('namespaces');
+            $xml->appendChild($namespacesXML);
         }
 
         // add commands by namespace
         foreach ($this->sortCommands($commands) as $space => $commands) {
             if (!$namespace) {
-                $namespacesXML->appendChild($namespaceArrayXML = $dom->createElement('namespace'));
+                $namespaceArrayXML = $dom->createElement('namespace');
+                $namespacesXML->appendChild($namespaceArrayXML);
                 $namespaceArrayXML->setAttribute('id', $space);
             }
 
             foreach ($commands as $command) {
                 if (!$namespace) {
-                    $namespaceArrayXML->appendChild($commandXML = $dom->createElement('command'));
+                    $commandXML = $dom->createElement('command');
+                    $namespaceArrayXML->appendChild($commandXML);
                     $commandXML->appendChild($dom->createTextNode($command->getName()));
                 }
 
@@ -654,64 +662,80 @@ class Application
             return function_exists('mb_strlen') ? mb_strlen($string) : strlen($string);
         };
 
-        $title = sprintf('  [%s]  ', get_class($e));
-        $len = $strlen($title);
-        $lines = array();
-        foreach (explode("\n", $e->getMessage()) as $line) {
-            $lines[] = sprintf('  %s  ', $line);
-            $len = max($strlen($line) + 4, $len);
-        }
+        do {
+            $title = sprintf('  [%s]  ', get_class($e));
+            $len = $strlen($title);
+            $lines = array();
+            foreach (explode("\n", $e->getMessage()) as $line) {
+                $lines[] = sprintf('  %s  ', $line);
+                $len = max($strlen($line) + 4, $len);
+            }
 
-        $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', $len - $strlen($title)));
+            $messages = array(str_repeat(' ', $len), $title.str_repeat(' ', $len - $strlen($title)));
 
-        foreach ($lines as $line) {
-            $messages[] = $line.str_repeat(' ', $len - $strlen($line));
-        }
+            foreach ($lines as $line) {
+                $messages[] = $line.str_repeat(' ', $len - $strlen($line));
+            }
 
-        $messages[] = str_repeat(' ', $len);
+            $messages[] = str_repeat(' ', $len);
 
-        $output->writeln("\n");
-        foreach ($messages as $message) {
-            $output->writeln('<error>'.$message.'</error>');
-        }
-        $output->writeln("\n");
+            $output->writeln("\n");
+            foreach ($messages as $message) {
+                $output->writeln('<error>'.$message.'</error>');
+            }
+            $output->writeln("\n");
+
+            if (Output::VERBOSITY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('</comment>Exception trace:</comment>');
+
+                // exception related properties
+                $trace = $e->getTrace();
+                array_unshift($trace, array(
+                    'function' => '',
+                    'file'     => $e->getFile() != null ? $e->getFile() : 'n/a',
+                    'line'     => $e->getLine() != null ? $e->getLine() : 'n/a',
+                    'args'     => array(),
+                ));
+
+                for ($i = 0, $count = count($trace); $i < $count; $i++) {
+                    $class = isset($trace[$i]['class']) ? $trace[$i]['class'] : '';
+                    $type = isset($trace[$i]['type']) ? $trace[$i]['type'] : '';
+                    $function = $trace[$i]['function'];
+                    $file = isset($trace[$i]['file']) ? $trace[$i]['file'] : 'n/a';
+                    $line = isset($trace[$i]['line']) ? $trace[$i]['line'] : 'n/a';
+
+                    $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
+                }
+
+                $output->writeln("\n");
+            }
+        } while ($e = $e->getPrevious());
 
         if (null !== $this->runningCommand) {
             $output->writeln(sprintf('<info>%s</info>', sprintf($this->runningCommand->getSynopsis(), $this->getName())));
             $output->writeln("\n");
         }
-
-        if (Output::VERBOSITY_VERBOSE === $output->getVerbosity()) {
-            $output->writeln('</comment>Exception trace:</comment>');
-
-            // exception related properties
-            $trace = $e->getTrace();
-            array_unshift($trace, array(
-                'function' => '',
-                'file'     => $e->getFile() != null ? $e->getFile() : 'n/a',
-                'line'     => $e->getLine() != null ? $e->getLine() : 'n/a',
-                'args'     => array(),
-            ));
-
-            for ($i = 0, $count = count($trace); $i < $count; $i++) {
-                $class = isset($trace[$i]['class']) ? $trace[$i]['class'] : '';
-                $type = isset($trace[$i]['type']) ? $trace[$i]['type'] : '';
-                $function = $trace[$i]['function'];
-                $file = isset($trace[$i]['file']) ? $trace[$i]['file'] : 'n/a';
-                $line = isset($trace[$i]['line']) ? $trace[$i]['line'] : 'n/a';
-
-                $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
-            }
-
-            $output->writeln("\n");
-        }
     }
 
+    /**
+     * Gets the name of the command based on input.
+     *
+     * @param InputInterface $input The input interface
+     * 
+     * @return string The command name
+     */
     protected function getCommandName(InputInterface $input)
     {
         return $input->getFirstArgument('command');
     }
 
+    /**
+     * Sorts commands in alphabetical order.
+     *
+     * @param array $commands An associative array of commands to sort
+     *
+     * @return array A sorted array of commands
+     */
     protected function sortCommands($commands)
     {
         $namespacedCommands = array();
@@ -726,13 +750,20 @@ class Application
         }
         ksort($namespacedCommands);
 
-        foreach ($namespacedCommands as $name => &$commands) {
+        foreach ($namespacedCommands as &$commands) {
             ksort($commands);
         }
 
         return $namespacedCommands;
     }
 
+    /**
+     * Returns abbreviated suggestions in string format.
+     *
+     * @param array $abbrevs Abbreviated suggestions to convert
+     *
+     * @return string A formatted string of abbreviated suggestions
+     */
     protected function getAbbreviationSuggestions($abbrevs)
     {
         return sprintf('%s, %s%s', $abbrevs[0], $abbrevs[1], count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');

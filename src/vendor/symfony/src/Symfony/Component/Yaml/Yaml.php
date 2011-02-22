@@ -1,19 +1,20 @@
 <?php
 
-namespace Symfony\Component\Yaml;
-
 /*
  * This file is part of the Symfony package.
- * (c) 2004-2006 Fabien Potencier <fabien.potencier@symfony-project.com>
+ *
+ * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\Yaml;
+
 /**
  * Yaml offers convenience methods to load and dump YAML.
  *
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.com>
  */
 class Yaml
 {
@@ -57,7 +58,7 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
-     * @param string $input Path of YAML file or string containing YAML
+     * @param string $input Path to a YAML file or a string containing YAML
      *
      * @return array The YAML converted to a PHP array
      *
@@ -89,7 +90,7 @@ class Yaml
         try {
             $ret = $yaml->parse($input);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()));
+            throw new \InvalidArgumentException(sprintf('Unable to parse %s: %s', $file ? sprintf('file "%s"', $file) : 'string', $e->getMessage()), 0, $e);
         }
 
         return $ret;
