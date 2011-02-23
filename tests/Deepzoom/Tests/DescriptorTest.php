@@ -1,46 +1,23 @@
 <?php
+
+/*
+ * This file is part of the Deepzoom.php package.
+ *
+ * (c) Nicolas Fabre <nicolas.fabre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Deepzoom\Tests;
+
+use Deepzoom\Exception as dzException;
 
 use Deepzoom;
 
 use Deepzoom\Descriptor;
 use Deepzoom\Tests\Fixtures\StreamWrapper\Stub as streamStub;
 use Deepzoom\StreamWrapper\File;
-use Deepzoom\Exception as dzException;
-
-/**
-* Deep Zoom Tools
-*
-* Copyright (c) 2008-2010, OpenZoom <http://openzoom.org/>
-* Copyright (c) 2008-2010, Nicolas Fabre <nicolas.fabre@gmail.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of OpenZoom nor the names of its contributors may be used
-* to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
 /**
  * Testing Descriptor
  *
@@ -52,7 +29,7 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->path = __DIR__.'/Fixtures/';
+        $this->path = __DIR__.DEEPZOOM_TESTSUITE_FIXTURES_PATH;
     }
 
 	public function testConstructor()
@@ -63,119 +40,128 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(256, $descriptor->getTileSize(), '__construct() takes the tile size as its first argument');
         $this->assertEquals(0, $descriptor->getTileOverlap(), '__construct() takes the tile overlap as its first argument');
         $this->assertEquals('png', $descriptor->getTileFormat(), '__construct() takes the tile format as its first argument');
-         $this->assertAttributeInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface','_streamWrapper',$descriptor, '__construct() takes the tile size as its first argument');
+        $this->assertAttributeInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface','_streamWrapper',$descriptor, '__construct() takes the tile size as its first argument');
     }
     
     public function testOpenFile()
     {
-    	$descriptor = new Descriptor(new File());
+    	$descriptor = new Descriptor($this->_getMockFileForOpenTest());
     	$descriptor->open($this->path.'model1.xml');
     	$this->assertTrue(true);
     }
     
+	public function testOpenFileButInvalidXml()
+    {
+    	$descriptor = new Descriptor($this->_getMockFileForOpenTestButInvalidXml());
+    	try {
+    		$descriptor->open($this->path.'model1.xml');
+    		$this->fail('No exception caught');
+    	}catch (dzException $e) {
+    		$this->assertStringStartsWith('Invalid Xml',$e->getMessage());
+    	}
+    }
+
 	public function testOpenFileButDeepzoomException()
     {
-    	$descriptor = new Descriptor(new File());
+    	$descriptor = new Descriptor($this->_getMockFileForOpenTestButFail());
     	try {
-    		$descriptor->open($this->path.'fail.xml');
-    	}catch (dzException $e) {
+    		$descriptor->open($this->path.'model1.xml');
+    		$this->fail('No exception caught');
+    	}catch (\InvalidArgumentException $e) {
     		$this->assertStringStartsWith('File not found',$e->getMessage());
     	}
     }
     
-	public function testSaveFile()
-    {
-    	$descriptor = new Descriptor(new File());
-    	$descriptor->open($this->path.'model1.xml');
-    	$descriptor->save($this->path.'model1-sav.xml');
-    	$this->assertFileEquals($this->path.'model1.xml',$this->path.'model1-sav.xml');
-    }
-    
     public function testDump()
     {
-    	$method = new \ReflectionMethod(
-          'Deepzoom\Descriptor', 'dump'
-        );
-        $method->setAccessible(TRUE);
-    	$this->assertEquals(
-          $this->_getDumpDescriptor(), $method->invoke(new Descriptor(new File()))
-        );
-    }   
+    	$descriptor = new Descriptor(new File());
+    	$this->assertEquals($this->getDumpDescriptor(), $descriptor->dump());
+    }  
     
-    public function testSetGetWidth()
+ 	public function testSetterAndGetterForWidthAttribute()
     {
-        $descriptor = new Descriptor(new streamStub());
+        $descriptor = new Descriptor(new File());
         $descriptor->setWidth(100);
+        $this->assertAttributeInternalType('int', '_width', $descriptor);
+        $this->assertAttributeEquals(100, '_width', $descriptor);
         $this->assertEquals(100, $descriptor->getWidth(), '->setWidth() sets the width of the image');
     }
     
-    public function testSetGetHeight()
+    public function testSetterAndGetterForHeightAttribute()
     {
-        $descriptor = new Descriptor(new streamStub());
+        $descriptor = new Descriptor(new File());
         $descriptor->setHeight(100);
+        $this->assertAttributeInternalType('int', '_height', $descriptor);
+        $this->assertAttributeEquals(100, '_height', $descriptor);
         $this->assertEquals(100, $descriptor->getHeight(), '->setHeight() sets the height of the image');
     }    
     
-    public function testSetGetTileSize()
+	public function testSetterAndGetterForTileSizeAttribute()
     {
-        $descriptor = new Descriptor(new streamStub());
+        $descriptor = new Descriptor(new File());
         $descriptor->setTileSize(289);
+        $this->assertAttributeInternalType('int', '_tileSize', $descriptor);
+        $this->assertAttributeEquals(289, '_tileSize', $descriptor);
         $this->assertEquals(289, $descriptor->getTileSize(), '->setTileSize() sets the size of the tile');
     }
-
     
-    public function testSetGetTileOverlap()
+    public function testSetterAndGetterForTileOverlapAttribute()
     {
-        $descriptor = new Descriptor(new streamStub());
+        $descriptor = new Descriptor(new File());
         $descriptor->setTileOverlap(0);
+        $this->assertAttributeInternalType('int', '_tileOverlap', $descriptor);
+        $this->assertAttributeEquals(0, '_tileOverlap', $descriptor);
         $this->assertEquals(0, $descriptor->getTileOverlap(), '->setTileOverlap() sets the overlap of the tile');
     }    
-
     
-    public function testSetGetTileFormat()
+	public function testSetterAndGetterForTileFormatAttribute()
     {
-        $descriptor = new Descriptor(new streamStub());
+        $descriptor = new Descriptor(new File());
         $descriptor->setTileFormat('png');
+        $this->assertAttributeInternalType('string', '_tileFormat', $descriptor);
+        $this->assertAttributeEquals('png', '_tileFormat', $descriptor);
         $this->assertEquals('png', $descriptor->getTileFormat(), '->setTileFormat() sets the format of the tile');
     }
     
-    public function testGetNumLevels(){
+	public function testGetNumLevels(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);	
-    	 $this->assertEquals(12,$descriptor->getNumLevels(), '->getNumLevels() gets the number of levels in the pyramid');
     	 $this->assertGreaterThan(0,$descriptor->getNumLevels(), '->getNumLevels() gets the number of levels in the pyramid');
-    }
-    
+	 	 $this->assertEquals(12,$descriptor->getNumLevels(), '->getNumLevels() gets the number of levels in the pyramid');
+	}
+	
 	public function testGetScale(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);	
     	 foreach (range(0,11) as $level) {
     	 	$this->assertLessThanOrEqual(1,$descriptor->getScale($level), '->getScale() gets the scale of a pyramid level');
     	 }
-    	 
     }
     
-    public function testGetStreamWrapper(){
-         $descriptor = new Descriptor(new streamStub());  
-         $descriptor->setStreamWrapper(new File());
-         $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface',$descriptor->getStreamWrapper());
-         $this->assertInstanceOf('Deepzoom\StreamWrapper\File',$descriptor->getStreamWrapper());
-    }
-    
-    public function testGetScaleException(){
+	public function testGetScaleButInvalidArgumentException(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
     	 try {
     		$descriptor->getScale($descriptor->getNumLevels());
     		$this->fail('Exception fail');
-    	 }catch (dzException $e) {
+    	 }catch (\InvalidArgumentException $e) {
     		$this->assertStringStartsWith('Invalid pyramid level',$e->getMessage());
     	 } 
     }
     
-	public function testGetDimensionException(){
+	public function testSetterAndGetterForStreamWrapperAttribute(){
+         $descriptor = new Descriptor(new streamStub());  
+         $file = new File();
+         $descriptor->setStreamWrapper($file);
+         $this->assertAttributeInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface', '_streamWrapper', $descriptor);
+         $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface',$descriptor->getStreamWrapper());
+         $this->assertInstanceOf('Deepzoom\StreamWrapper\File',$descriptor->getStreamWrapper());
+         $this->assertSame($file,$descriptor->getStreamWrapper());
+    }
+    
+	public function testGetDimensionButInvalidArgumentException(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
     	 try {
     		$descriptor->getDimension($descriptor->getNumLevels());
     		$this->fail('Exception fail');
-    	 }catch (dzException $e) {
+    	 }catch (\InvalidArgumentException $e) {
     		$this->assertStringStartsWith('Invalid pyramid level',$e->getMessage());
     	 } 
     }
@@ -188,12 +174,12 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     	 }
     }
     
-	public function testGetNumTilesException(){
+	public function testGetNumTilesButInvalidArgumentException(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
     	 try {
     		$descriptor->getNumTiles($descriptor->getNumLevels());
     		$this->fail('Exception fail');
-    	 }catch (dzException $e) {
+    	 }catch (\InvalidArgumentException $e) {
     		$this->assertStringStartsWith('Invalid pyramid level',$e->getMessage());
     	 } 
     }
@@ -209,12 +195,12 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     	 }
     }
     
-	public function testGetTileBoundsException(){
+	public function testGetTileBoundsButInvalidArgumentException(){
     	 $descriptor = new Descriptor(new streamStub(),2048,1536);
     	 try {
     		$descriptor->getTileBounds($descriptor->getNumLevels(),0,0);
     		$this->fail('Exception fail');
-    	 }catch (dzException $e) {
+    	 }catch (\InvalidArgumentException $e) {
     		$this->assertStringStartsWith('Invalid pyramid level',$e->getMessage());
     	 } 
     }
@@ -225,13 +211,64 @@ class DescriptorTest extends \PHPUnit_Framework_TestCase
     		$this->assertEquals(array('x', 'y','width', 'height'), array_keys($descriptor->getTileBounds($level,1,1)), '->getTileBounds() gets the bounding box of the tile in a pyramid level');
     	}	
     }
-        
-    protected function _getDumpDescriptor(){
+    
+	public function testSaveFile()
+    {
+    	$descriptor = new Descriptor(new File());
+    	$descriptor->open($this->path.'model1.xml');
+    	$descriptor->save(DEEPZOOM_TESTSUITE_DESTINATION_PATH.'model1-sav.xml');
+    	$this->assertFileEquals($this->path.'model1.xml',DEEPZOOM_TESTSUITE_DESTINATION_PATH.'model1-sav.xml');
+    }
+    
+    public function getDumpDescriptor(){
         return <<<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Image TileSize="254" Overlap="1" Format="jpg" xmlns="http://schemas.microsoft.com/deepzoom/2008">
 	<Size Width="" Height=""/>
 </Image>
 EOF;
-    }    	
+    }    
+
+    public function getInvalidDescriptor(){
+        return <<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+EOF;
+    }    
+    
+    protected function _getMockFileForOpenTest() {
+    	$file = $this->getMock('Deepzoom\\StreamWrapper\\File',array(),array(),'',false);	
+    	$file->expects($this->once())
+				   ->method('exists')
+				   ->with($this->isType('string'))
+				   ->will($this->returnValue(true));
+		$file->expects($this->once())
+		           ->method('getContents')
+				   ->with($this->isType('string'))
+				   ->will($this->returnCallback(array($this,'getDumpDescriptor')));		   
+		return $file;			   
+    }
+    
+	protected function _getMockFileForOpenTestButInvalidXml() {
+    	$file = $this->getMock('Deepzoom\\StreamWrapper\\File',array(),array(),'',false);	
+    	$file->expects($this->once())
+				   ->method('exists')
+				   ->with($this->isType('string'))
+				   ->will($this->returnValue(true));
+		$file->expects($this->once())
+		           ->method('getContents')
+				   ->with($this->isType('string'))
+				   ->will($this->returnCallback(array($this,'getInvalidDescriptor')));		   
+		return $file;			   
+    }
+    
+ 	protected function _getMockFileForOpenTestButFail() {
+    	$file = $this->getMock('Deepzoom\\StreamWrapper\\File',array(),array(),'',false);	
+    	$file->expects($this->once())
+				   ->method('exists')
+				   ->with($this->isType('string'))
+				   ->will($this->returnValue(false));
+		$file->expects($this->never())
+		           ->method('getContents');
+		return $file;			   
+    }
 }
