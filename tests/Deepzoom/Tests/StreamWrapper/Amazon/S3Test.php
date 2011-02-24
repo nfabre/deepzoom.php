@@ -1,41 +1,18 @@
 <?php
+
+/*
+ * This file is part of the Deepzoom.php package.
+ *
+ * (c) Nicolas Fabre <nicolas.fabre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Deepzoom\Tests\StreamWrapper\Amazon;
 
 use Deepzoom\Exception as dzException;
 use Deepzoom\StreamWrapper\Amazon\S3;
-
-/**
-* Deep Zoom Tools
-*
-* Copyright (c) 2008-2010, OpenZoom <http://openzoom.org/>
-* Copyright (c) 2008-2010, Nicolas Fabre <nicolas.fabre@gmail.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of OpenZoom nor the names of its contributors may be used
-* to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /**
  * Testing Amazon S3 Wrapper
@@ -49,31 +26,31 @@ class S3Test extends \PHPUnit_Framework_TestCase
 	protected static $blobConfig;
 	protected static $blobStorage;
 	
-    static public function setUpBeforeClass()
-    {
+    static public function setUpBeforeClass() {
     	self::$blobConfig = array(
            'container'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_CONTAINER,     
            'accessKey'       => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_ACCESSKEY,     
            'secretAccessKey' => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_SECRETACCESSKEY,     
            'name'            => DEEPZOOM_TESTSUITE_STREAMWRAPPER_AMAZON_S3_NAME,     
         );
-        self::$blobStorage = new \Zend_Service_Amazon_S3(self::$blobConfig['accessKey'],self::$blobConfig['secretAccessKey']);
-        if(!self::$blobStorage->isBucketAvailable(self::$blobConfig['container'])){
-            self::$blobStorage->createBucket(self::$blobConfig['container']);
+        if(!empty(self::$blobConfig['accessKey']) && !empty(self::$blobConfig['secretAccessKey']) ) {   
+	        self::$blobStorage = new \Zend_Service_Amazon_S3(self::$blobConfig['accessKey'],self::$blobConfig['secretAccessKey']);
+	        if(!self::$blobStorage->isBucketAvailable(self::$blobConfig['container'])){
+	            self::$blobStorage->createBucket(self::$blobConfig['container']);
+	        }
+	          	
+	        self::$blobStorage->putObject(self::$blobConfig['container'].'/mypath/model1.xml', file_get_contents(__DIR__.'/../../Fixtures/model1.xml'),
+	            array(\Zend_Service_Amazon_S3::S3_ACL_HEADER => \Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ)
+	        );
         }
-          	
-        self::$blobStorage->putObject(self::$blobConfig['container'].'/mypath/model1.xml', file_get_contents(__DIR__.'/../../Fixtures/model1.xml'),
-            array(\Zend_Service_Amazon_S3::S3_ACL_HEADER => \Zend_Service_Amazon_S3::S3_ACL_PUBLIC_READ)
-        );
     }
 
     public function setUp()
     {
+    	if(empty(self::$blobConfig['accessKey']) || empty(self::$blobConfig['secretAccessKey']) ) {
+        	$this->markTestSkipped('Amazon S3 is not properly configured');	
+        }
         $this->path = 'mypath';
-    }
-    
-    public static function tearDownAfterClass()
-    {
     }
     
     protected function getWrapperInstance() {
@@ -101,7 +78,6 @@ class S3Test extends \PHPUnit_Framework_TestCase
      }
      
      public function testExistDirectoryNotExist() {
-     	$this->markTestSkipped('Invalid result, wtf?');
         $blobWrapper = $this->getWrapperInstance();
         $this->assertFalse($blobWrapper->exists($this->path.'/model2.xml'));    
      }
