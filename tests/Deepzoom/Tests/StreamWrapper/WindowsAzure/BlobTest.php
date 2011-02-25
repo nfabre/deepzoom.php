@@ -1,41 +1,18 @@
 <?php
+
+/*
+ * This file is part of the Deepzoom.php package.
+ *
+ * (c) Nicolas Fabre <nicolas.fabre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Deepzoom\Tests\StreamWrapper\WindowsAzure;
 
 use Deepzoom\Exception as dzException;
 use Deepzoom\StreamWrapper\WindowsAzure\Blob;
-
-/**
-* Deep Zoom Tools
-*
-* Copyright (c) 2008-2010, OpenZoom <http://openzoom.org/>
-* Copyright (c) 2008-2010, Nicolas Fabre <nicolas.fabre@gmail.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of OpenZoom nor the names of its contributors may be used
-* to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /**
  * Testing Windows Azure Blob Wrapper
@@ -74,15 +51,10 @@ class BlobTest extends \PHPUnit_Framework_TestCase
     
     public function setUp()
     {
-    	 if(empty(self::$blobConfig['account']) || empty(self::$blobConfig['credencial']) ) {
+    	if(empty(self::$blobConfig['account']) || empty(self::$blobConfig['credencial']) ) {
         	$this->markTestSkipped('Windows Azure is not properly configured');	
         }
         $this->path = 'mypath';
-    }
-    
-    public static function tearDownAfterClass()
-    {
-    	//self::$blobStorage->deleteContainer(self::$blobConfig['container']);
     }
     
     protected function getWrapperInstance() {
@@ -92,9 +64,9 @@ class BlobTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $blobWrapper = $this->getWrapperInstance();
-        $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface',$blobWrapper, '__construct()'); 
-        $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperAbstract',$blobWrapper, '__construct()'); 
-        $this->assertInstanceOf('Deepzoom\StreamWrapper\WindowsAzure\Blob',$blobWrapper, '__construct()'); 
+        $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperInterface',$blobWrapper); 
+        $this->assertInstanceOf('Deepzoom\StreamWrapper\StreamWrapperAbstract',$blobWrapper); 
+        $this->assertInstanceOf('Deepzoom\StreamWrapper\WindowsAzure\Blob',$blobWrapper); 
     }
     
     public function testEnsure() {
@@ -107,17 +79,6 @@ class BlobTest extends \PHPUnit_Framework_TestCase
         $blobWrapper = $this->getWrapperInstance();
         $blobConfig = self::$blobConfig;
      	$this->assertEquals("{$blobConfig['name']}://{$blobConfig['container']}/", $blobWrapper->getPrefix());	
-     }
-     
-     public function testExistDirectoryNotExist() {
-     	$this->markTestSkipped('Invalid result, wtf?');
-        $blobWrapper = $this->getWrapperInstance();
-        $this->assertFalse($blobWrapper->exists($this->path.'/model2.xml'));    
-     }
-     
-     public function testExist() {
-     	$blobWrapper = $this->getWrapperInstance();
-        $this->assertTrue($blobWrapper->exists($this->path.'/model1.xml'));    
      }
      
      public function testGetPathInfo() {
