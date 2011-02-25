@@ -1,6 +1,7 @@
 .project
-index.php
 .buildpath
-tests/PHPUnit/*
 .settings/*
 .externalToolBuilders/*
+src/vendor/imagine
+build
+phpunit.xml
