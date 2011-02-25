@@ -1,40 +1,17 @@
 <?php
+
+/*
+ * This file is part of the Deepzoom.php package.
+ *
+ * (c) Nicolas Fabre <nicolas.fabre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Deepzoom;
 
 use Deepzoom\StreamWrapper\StreamWrapperInterface;
-
-/**
-* Deep Zoom Tools
-*
-* Copyright (c) 2008-2010, OpenZoom <http://openzoom.org/>
-* Copyright (c) 2008-2010, Nicolas Fabre <nicolas.fabre@gmail.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of OpenZoom nor the names of its contributors may be used
-* to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /**
  * Descriptor 
@@ -124,17 +101,22 @@ class Descriptor implements DescriptorInterface {
 	 * @param string $source
 	 * 
 	 * @return Deepzoom\Descriptor Fluent interface
-	 * @throw Deepzoom\Exception check pyramid level
+	 * @throw InvalidArgumentExceptioncheck pyramid level
 	 */
 	public function open($source) {
 		if($this->_streamWrapper->exists($source)) {
-			$xml = simplexml_load_string($this->_streamWrapper->getContents($source));
-			$this->_width = (int)$xml->Size["Width"];
-	        $this->_height = (int)$xml->Size["Height"];
-	        $this->_tileSize = (int)$xml["TileSize"];
-	        $this->_tileOverlap = (int)$xml["Overlap"];
-	        $this->_tileFormat = (string)$xml["Format"];
-		} else throw new Exception('File not found : '.$source);
+			/**
+			 * @var $xml SimpleXMLElement
+			 */
+			$xml = simplexml_load_string($this->_streamWrapper->getContents($source),null,LIBXML_NOERROR);
+			if($xml !== false) {
+				$this->_width = (int)$xml->Size["Width"];
+		        $this->_height = (int)$xml->Size["Height"];
+		        $this->_tileSize = (int)$xml["TileSize"];
+		        $this->_tileOverlap = (int)$xml["Overlap"];
+		        $this->_tileFormat = (string)$xml["Format"];
+			} else throw new Exception('Invalid Xml');
+		} else throw new \InvalidArgumentException('File not found : '.$source);
 		
 	    return $this;
 	}
@@ -181,14 +163,14 @@ class Descriptor implements DescriptorInterface {
 	 *
 	 * @param int $level
 	 * @return float
-	 * @throw Deepzoom\Exception check pyramid level
+	 * @throw InvalidArgumentExceptioncheck pyramid level
 	 */
 	public function getScale($level) {
 		if(0 <= $level && $level < $this->getNumLevels()) {
 			$maxLevel = $this->getNumLevels() - 1 ;
 			
 			return pow(0.5,$maxLevel - $level);
-		} else throw new Exception("Invalid pyramid level (scale)");
+		} else throw new \InvalidArgumentException("Invalid pyramid level (scale)");
 	} 
 	
 	/**
@@ -196,7 +178,7 @@ class Descriptor implements DescriptorInterface {
 	 *
 	 * @param int $level
 	 * @return array
-	 * @throw Deepzoom\Exception check pyramid level
+	 * @throw InvalidArgumentExceptioncheck pyramid level
 	 */
 	public function getDimension($level) {
 		$key = $this->getDimensionKey($level);
@@ -206,7 +188,7 @@ class Descriptor implements DescriptorInterface {
 				$width = (int)ceil($this->_width * $scale);
 				$height = (int)ceil($this->_height * $scale);
 				$this->_dimensions[$key] = array('width' => $width,'height' => $height);
-			} else throw new Exception("Invalid pyramid level (dimension)");
+			} else throw new \InvalidArgumentException("Invalid pyramid level (dimension)");
 		}
 		 
 		return $this->_dimensions[$key];
@@ -217,7 +199,7 @@ class Descriptor implements DescriptorInterface {
 	 *
 	 * @param int $level
 	 * @return array
-	 * @throw Deepzoom\Exception check pyramid level
+	 * @throw InvalidArgumentExceptioncheck pyramid level
 	 */
 	public function getNumTiles($level) {
 		if(0 <= $level and $level < $this->getNumLevels()) {
@@ -226,7 +208,7 @@ class Descriptor implements DescriptorInterface {
 			$rows = (int)ceil(floatval($dimension['height']) / $this->_tileSize);
 			
 			return array('columns' => $columns, 'rows' => $rows);
-		} else throw new Exception("Invalid pyramid level (NumTiles)");
+		} else throw new \InvalidArgumentException("Invalid pyramid level (NumTiles)");
 	}
 	
 	 /**
@@ -237,7 +219,7 @@ class Descriptor implements DescriptorInterface {
      * @param int $row
      * 
      * @return array (x,y,width,height)
-     * @throw Deepzoom\Exception check pyramid level
+     * @throw InvalidArgumentExceptioncheck pyramid level
      */ 
     public function getTileBounds($level, $column, $row) {
     	 if(0 <= $level and $level < $this->getNumLevels()) {
@@ -250,7 +232,7 @@ class Descriptor implements DescriptorInterface {
 			$newHeight = min($height, $dimension['height'] - $position['y']);
 			
 			return array_merge($position,array( 'width' => $newWidth,'height' => $newHeight));
-		} else throw new Exception("Invalid pyramid level (TileBounds)");
+		} else throw new \InvalidArgumentException("Invalid pyramid level (TileBounds)");
     } 
     
     /**

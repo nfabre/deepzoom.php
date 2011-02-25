@@ -1,42 +1,19 @@
 <?php
+
+/*
+ * This file is part of the Deepzoom.php package.
+ *
+ * (c) Nicolas Fabre <nicolas.fabre@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Deepzoom\Tests\ImageAdapter;
 
 use Deepzoom\ImageAdapter\GdThumb;
 use Deepzoom\Exception as dzException;
 use Deepzoom\StreamWrapper\File;
-
-/**
-* Deep Zoom Tools
-*
-* Copyright (c) 2008-2010, OpenZoom <http://openzoom.org/>
-* Copyright (c) 2008-2010, Nicolas Fabre <nicolas.fabre@gmail.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without modification,
-* are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-*
-* 3. Neither the name of OpenZoom nor the names of its contributors may be used
-* to endorse or promote products derived from this software without
-* specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /**
  * Testing Image Creator
@@ -47,21 +24,17 @@ use Deepzoom\StreamWrapper\File;
  */
 class GdThumbTest extends \PHPUnit_Framework_TestCase
 {
-	static public function setUpBeforeClass()
-    {
-    }
-
-    public function setUp()
-    {
-      $this->path = __DIR__.'/../Fixtures/';
-      if(!extension_loaded('gd')) {
-      	$this->markTestSkipped('Extension GD not loaded');	
-      }
-    }
+	public function setUp() {
+		$this->path = __DIR__ . '/../Fixtures/';
+		if (!function_exists('gd_info')) {
+			$this->markTestSkipped('Extension GD not loaded');
+		}
+	}
     
-	protected function tearDown()
-    {
-        
+	protected function tearDown() {
+    	if(file_exists(DEEPZOOM_TESTSUITE_DESTINATION_PATH.'hlegius.save.jpg')) {
+    		unlink(DEEPZOOM_TESTSUITE_DESTINATION_PATH.'hlegius.save.jpg');
+    	}
     }
     
 	public function testConstructor()
@@ -83,7 +56,7 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     public function testResize() {
     	$imageCreator = new GdThumb();	
     	$imageCreator->setSource($this->path.'hlegius.jpg');
-    	$return = $imageCreator->resize(100,100);
+    	$return = $imageCreator->resizePx(100,100);
     	$this->assertInstanceOf('Deepzoom\ImageAdapter\ImageAdapterInterface',$return, 'resize() Resizes an image to be no larger than $width or $height'); 
     	$this->assertAttributeInternalType('array','currentDimensions',$return,'resize() Resizes an image to be no larger than $width or $height'); 
     	// preserve the proportions
@@ -103,12 +76,11 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     }
     
      public function testSave() {
-     	unlink($this->path.'hlegius.save.jpg');
     	$imageCreator = new GdThumb();	
     	$imageCreator->setStreamWrapper(new File());
     	$imageCreator->setSource($this->path.'hlegius.jpg');
-     	$imageCreator->save($this->path.'hlegius.save.jpg');
-     	$this->assertFileExists($this->path.'hlegius.save.jpg');
+     	$imageCreator->save(DEEPZOOM_TESTSUITE_DESTINATION_PATH.'hlegius.save.jpg');
+     	$this->assertFileExists(DEEPZOOM_TESTSUITE_DESTINATION_PATH.'hlegius.save.jpg');
      }
      
       public function testCrop() {
@@ -121,12 +93,6 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
     	$this->assertAttributeInternalType('resource','oldImage',$return,'crop() Cropping function that crops an image using $startX and $startY as the upper-left hand corner'); 
       }
       
-      public function testNewImage() {
-        $imageCreator = new GdThumb();  
-        $imageCreator->setStreamWrapper(new File());
-        //$imageCreator->newImage(50,50);
-     }
-     
      public function testCalcImageSize() {
         $imageCreator = new GdThumb();  
         $imageCreator->setSource($this->path.'hlegius.jpg');
@@ -137,6 +103,9 @@ class GdThumbTest extends \PHPUnit_Framework_TestCase
         $result = $method->invoke($imageCreator,0,100);
         $this->assertInternalType('array',$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
         $this->assertEquals(array('newWidth' => 1, 'newHeight' => 100),$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
+		$result = $method->invoke($imageCreator,0,0);
+        $this->assertInternalType('array',$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
+        $this->assertEquals(array('newWidth' => 1, 'newHeight' => 1),$result,'calcImageSize() These calculations are based on both the provided dimensions and $this->maxWidth and $this->maxHeight'); 
         
      }
       
